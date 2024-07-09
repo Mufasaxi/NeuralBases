@@ -27,4 +27,4 @@ pip install -r requirements.txt
 
 ## Source code
 In the ```src``` directory one could find the documented files necessary for probing the tablebase. The FEN used in the example are arbitrary.
-The [UCI Engine](https://github.com/Mufasaxi/NeuralBases/blob/main/src/uci_prober_engine.py) is there in need of integration with a GUI or for setting up the prober to play with other engines.
+The [UCI Engine](https://github.com/Mufasaxi/NeuralBases/blob/main/src/uci_prober_engine.py) is there in case of integration with a GUI or for setting up the prober to play with other engines.
