@@ -8,7 +8,7 @@ class Prober:
     def __init__(self):
         self.TABLEBASE_PATH = "./endgame_tablebase"
 
-        # Initialize the tablebase reader
+        # Initialise the tablebase reader
         self.tablebase = chess.syzygy.open_tablebase(self.TABLEBASE_PATH)
 
     def invert_wdl(self, wdl: int) -> int:
@@ -38,7 +38,7 @@ class Prober:
     
     def is_valid_fen(self, fen):
         """Check if a given FEN is valid"""
-        # Regular expression to validate the general structure of a FEN string
+        # Regular expression to validate the general structure of an FEN string
         fen_pattern = re.compile(
             r"^([rnbqkpRNBQKP1-8]{1,8}/){7}[rnbqkpRNBQKP1-8]{1,8} [wb] (K?Q?k?q?|-) ([a-h][36]|-) \d+ \d+$"
         )
