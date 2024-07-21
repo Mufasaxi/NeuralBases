@@ -1,5 +1,6 @@
 import chess
 from prober import Prober
+from minmax_engine import MinMaxEngine
 
 class UCIProberEngine:
     """
@@ -13,6 +14,7 @@ class UCIProberEngine:
         """
         self.prober: Prober = Prober()
         self.board: chess.Board = chess.Board()
+        self.minmax_engine = MinMaxEngine(self.prober)
 
     def handle_uci(self) -> None:
         """
@@ -90,10 +92,13 @@ class UCIProberEngine:
             print("info string Threefold repetition draw.")
             return 0
 
-        _, best_move = self.prober.evaluate_position(self.board.fen())
+        best_move = self.minmax_engine.get_best_move(self.board)
         if best_move is not None:
             print(f"bestmove {best_move.uci()}")
             self.board.push(best_move)
+            print(self.board)
+            return 2 if self.board.is_checkmate else 1
+        return 0
 
     def handle_selfplay(self) -> str:
         """
@@ -103,17 +108,16 @@ class UCIProberEngine:
         """
         print(self.board)
         while not self.board.is_game_over():
-            # self.handle_go()
             print(self.board)
             print()
             if self.board.is_game_over() or self.handle_go() == 0:
-                # break
-                return "over"
+                break
             self.handle_go()
             print()
 
         result = self.board.result()
         print(f"Game over. Result: {result}")
+        return
 
     def uci_loop(self):
         """
@@ -137,13 +141,10 @@ class UCIProberEngine:
                 elif command.startswith("position"):
                     self.handle_position(command)
                 elif command.startswith("go"):
-                    outcome = self.handle_go()
-                    if outcome == 0:
-                        break
+                    self.handle_go()
                 elif command == "selfplay":
-                    outcome = self.handle_selfplay()
-                    if outcome == "over":
-                        break
+                    self.handle_selfplay()
+                    break
                 elif command == "quit":
                     break
             except (EOFError, KeyboardInterrupt):
