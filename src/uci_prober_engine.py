@@ -67,35 +67,35 @@ class UCIProberEngine:
         if not self.prober.is_valid_fen(self.board.fen()):
             self.board = chess.Board()
 
-    def handle_go(self) -> None:
+    def handle_go(self) -> int:
         """
         Handles the 'go' command to make a move for the engine based on current board position.
         """
         if self.board.is_checkmate():
             print("info string Checkmate detected.")
-            return
+            return 0
         if self.board.is_stalemate():
             print("info string Stalemate detected.")
-            return
+            return 0
         if self.board.is_insufficient_material():
             print("info string Insufficient material detected.")
-            return
+            return 0
         if self.board.is_seventyfive_moves():
             print("info string Seventy-five move rule draw.")
-            return
+            return 0
         if self.board.is_fivefold_repetition():
             print("info string Fivefold repetition draw.")
-            return
+            return 0
         if self.board.is_repetition():
             print("info string Threefold repetition draw.")
-            return
+            return 0
 
         _, best_move = self.prober.evaluate_position(self.board.fen())
         if best_move is not None:
             print(f"bestmove {best_move.uci()}")
             self.board.push(best_move)
 
-    def handle_selfplay(self):
+    def handle_selfplay(self) -> str:
         """
         Handles the 'selfplay' command to play a game between two instances of the engine.
 
@@ -103,13 +103,13 @@ class UCIProberEngine:
         """
         print(self.board)
         while not self.board.is_game_over():
-            self.handle_go()
+            # self.handle_go()
             print(self.board)
             print()
-            if self.board.is_game_over():
-                break
+            if self.board.is_game_over() or self.handle_go() == 0:
+                # break
+                return "over"
             self.handle_go()
-            print(self.board)
             print()
 
         result = self.board.result()
@@ -137,9 +137,13 @@ class UCIProberEngine:
                 elif command.startswith("position"):
                     self.handle_position(command)
                 elif command.startswith("go"):
-                    self.handle_go()
+                    outcome = self.handle_go()
+                    if outcome == 0:
+                        break
                 elif command == "selfplay":
-                    self.handle_selfplay()
+                    outcome = self.handle_selfplay()
+                    if outcome == "over":
+                        break
                 elif command == "quit":
                     break
             except (EOFError, KeyboardInterrupt):
