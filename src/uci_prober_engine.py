@@ -97,7 +97,7 @@ class UCIProberEngine:
             print(f"bestmove {best_move.uci()}")
             self.board.push(best_move)
             print(self.board)
-            return 2 if self.board.is_checkmate else 1
+            return 2 if self.board.is_checkmate() else 1
         return 0
 
     def handle_selfplay(self) -> str:
