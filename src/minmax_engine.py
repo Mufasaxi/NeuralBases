@@ -5,7 +5,7 @@ import logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(filename="logs.log", filemode='w', format='%(asctime)s, %(msecs)d, %(message)s', level=logging.DEBUG)
 
-# source: chessprogrammingwiki
+# source: chessprogrammingwiki [https://www.chessprogramming.org/Simplified_Evaluation_Function]
 # realtive piece values
 PIECE_VALUES = {
     chess.PAWN: 100,
@@ -16,7 +16,6 @@ PIECE_VALUES = {
     chess.KING: 20000
 }
 
-# square values indicating effetive of a piece on that square
 PIECE_SQUARE_TABLES = {
     chess.PAWN: [
         0, 0, 0, 0, 0, 0, 0, 0,
@@ -69,14 +68,14 @@ PIECE_SQUARE_TABLES = {
         -20, -10, -10, -5, -5, -10, -10, -20
     ],
     chess.KING: [
-        20, 30, 10, 0, 0, 10, 30, 20,
-        20, 20, 0, 0, 0, 0, 20, 20,
-        -10, -20, -20, -20, -20, -20, -20, -10,
-        -20, -30, -30, -40, -40, -30, -30, -20,
-        -30, -40, -40, -50, -50, -40, -40, -30,
-        -30, -40, -40, -50, -50, -40, -40, -30,
-        -30, -40, -40, -50, -50, -40, -40, -30,
-        -30, -40, -40, -50, -50, -40, -40, -30
+        -50,-40,-30,-20,-20,-30,-40,-50,
+        -30,-20,-10,  0,  0,-10,-20,-30,
+        -30,-10, 20, 30, 30, 20,-10,-30,
+        -30,-10, 30, 40, 40, 30,-10,-30,
+        -30,-10, 30, 40, 40, 30,-10,-30,
+        -30,-10, 20, 30, 30, 20,-10,-30,
+        -30,-30,  0,  0,  0,  0,-30,-30,
+        -50,-30,-30,-30,-30,-30,-30,-50
     ]
 }
 
@@ -141,6 +140,10 @@ class MinMaxEngine:
                 eval, _ = self.minmax(board, depth - 1, alpha, beta, False)
                 board.pop()
                 logger.debug(f"Maximizing: Move {move} has eval {eval}\n")
+                
+                if eval == 9999 or eval == -9999:
+                    return eval, move
+                
                 if eval > max_eval:
                     max_eval = eval
                     best_move = move
@@ -161,7 +164,7 @@ class MinMaxEngine:
                 logger.debug(f"Minimizing: Move {move} has eval {eval}\n")
 
                 # should be removed?
-                if eval == 9999 or -9999:
+                if eval == 9999 or eval == -9999:
                     return eval, move
 
                 if eval < min_eval:
@@ -176,7 +179,7 @@ class MinMaxEngine:
             return min_eval, best_move
 
 
-    def get_best_move(self, board: chess.Board, depth: int = 5) -> chess.Move:
+    def get_best_move(self, board: chess.Board, depth: int = 6) -> chess.Move:
         _, best_move = self.minmax(board, depth, -float("inf"), float("inf"), True)
         return best_move
     
