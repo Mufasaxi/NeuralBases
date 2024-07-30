@@ -20,7 +20,7 @@ class UCIProberEngine:
         """
         Handles the 'uci' command by printing engine information required by the UCI protocol.
         """
-        print("id name ProberEngine")
+        print("id name ProberEngine (minmax)")
         print("id author Mustafa")
         print("uciok")
 
@@ -98,6 +98,8 @@ class UCIProberEngine:
             self.board.push(best_move)
             print(self.board)
             return 2 if self.board.is_checkmate() else 1
+        else:
+            best_move = list(self.board.legal_moves)[0]
         return 0
 
     def handle_selfplay(self) -> str:
@@ -112,7 +114,7 @@ class UCIProberEngine:
             print()
             if self.board.is_game_over() or self.handle_go() == 0:
                 break
-            self.handle_go()
+            # self.handle_go()
             print()
 
         result = self.board.result()
