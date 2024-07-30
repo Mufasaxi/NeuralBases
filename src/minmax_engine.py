@@ -1,6 +1,7 @@
 import chess
 import chess.engine
 import logging
+from prober import Prober
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(filename="logs.log", filemode='w', format='%(asctime)s, %(msecs)d, %(message)s', level=logging.DEBUG)
@@ -87,6 +88,7 @@ class MinMaxEngine:
         self.prober = prober
         self.transposition_table = {}
         self.killer_moves = {i:[None, None] for i in range(100)} # Moves that cause alpha beta cutoff
+        self.prober = Prober() # Experiment to have the wdl influence the eval to avoid dumb moves
 
     def evaluate_position(self, board: chess.Board) -> int:
         """
@@ -100,7 +102,7 @@ class MinMaxEngine:
         """
 
         if board.is_checkmate():
-            return -9999 if board.turn else 9999
+            return float('-inf') if board.turn else float('inf')
         elif board.is_stalemate() or board.is_insufficient_material() or board.is_seventyfive_moves():
             return 0
         else:
@@ -117,7 +119,14 @@ class MinMaxEngine:
                 for square in board.pieces(piece_type, chess.BLACK):
                     # sq_index = chess.square_mirror(square)  # mirror the square for piece-square table indexing
                     eval -= PIECE_SQUARE_TABLES.get(piece_type, [0]*64)[chess.square_mirror(square)]
-                
+                wdl = self.prober.tablebase.probe_wdl(board)
+                eval *= wdl
+                # print("***********************")
+                # print(board)
+                # print(wdl)
+                # print(eval)
+                # print("***********************")
+
             return eval
 
     def minmax(self, board: chess.Board, depth: int, alpha: float, beta: float, is_maximising_player: bool) -> tuple[int, chess.Move]:
@@ -141,7 +150,7 @@ class MinMaxEngine:
                 board.pop()
                 logger.debug(f"Maximizing: Move {move} has eval {eval}\n")
                 
-                if eval == 9999 or eval == -9999:
+                if eval == float('inf') or eval == float('-inf'):
                     return eval, move
                 
                 if eval > max_eval:
