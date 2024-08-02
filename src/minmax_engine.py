@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(filename="logs.log", filemode='w', format='%(asctime)s, %(msecs)d, %(message)s', level=logging.DEBUG)
 
 # source: chessprogrammingwiki [https://www.chessprogramming.org/Simplified_Evaluation_Function]
-# realtive piece values
+# relative piece values
 PIECE_VALUES = {
     chess.PAWN: 100,
     chess.KNIGHT: 320,
@@ -82,7 +82,7 @@ PIECE_SQUARE_TABLES = {
 
 class MinMaxEngine:
     """
-    MinMaxEngine is the brains alongside the prober. It uses MinMax with Alpha-Beta Pruning to find the best move within a given depth
+    MinMaxEngine is the brains alongside the prober. It uses MinMax with Alpha-Beta Pruning to find the best move within a given depth.
     """
     def __init__(self, prober) -> None:
         self.prober = prober
@@ -92,21 +92,21 @@ class MinMaxEngine:
 
     def evaluate_position(self, board: chess.Board) -> int:
         """
-        returns an evaluation for a given position. The higher the better it is for the side to move. Positive values favour white and negative favour black.
+        returns an evaluation for a given position. The higher (the absolute value) the better it is for the side to move. Positive values favour white and negative ones favour black.
 
         Parameters:
             board: Representation of the position with chess.Board
 
         Returns: 
-            evaluation: 9999 if mate for white and -9999 for black.
+            evaluation: infinity if mate for white and -infinity for black. Otherwise returns the evaluation based on the pieces present and their position.
         """
 
         if board.is_checkmate():
             return float('-inf') if board.turn else float('inf')
-        elif board.is_stalemate() or board.is_insufficient_material() or board.is_seventyfive_moves():
+        elif board.is_stalemate() or board.is_insufficient_material() or board.is_seventyfive_moves() or board.can_claim_draw():
             return 0
         else:
-            eval = 0
+            eval:float = 0
             for piece_type in chess.PIECE_TYPES:
                 # Evaluate material values
                 eval += sum(PIECE_VALUES.get(piece_type, 0) for piece in board.pieces(piece_type, chess.WHITE))
@@ -127,23 +127,23 @@ class MinMaxEngine:
                 # print(eval)
                 # print("***********************")
 
-            return eval
+            return eval if board.turn == chess.WHITE else -eval # unnecessary?
 
-    def minmax(self, board: chess.Board, depth: int, alpha: float, beta: float, is_maximising_player: bool) -> tuple[int, chess.Move]:
-        board_fen = board.fen()
+    def minmax(self, board: chess.Board, depth: int, alpha: float, beta: float, is_maximising_player: bool) -> tuple[float, chess.Move]:
+        board_fen:str = board.fen()
         if board_fen in self.transposition_table:
             logger.debug(f"In transposition table: {board_fen}")
             return self.transposition_table[board_fen]
 
         if depth == 0 or board.is_game_over():
-            eval = self.evaluate_position(board)
+            eval:float = self.evaluate_position(board)
             logger.debug(f"Evaluating position at depth {depth}: {eval}")
             return eval, None
 
         best_move = None
 
         if is_maximising_player:
-            max_eval = -float("inf")
+            max_eval:float = -float("inf")
             for move in sorted(board.legal_moves, key=lambda move: self.move_ordering_heuristic(board, move, depth), reverse=True):
                 board.push(move)
                 eval, _ = self.minmax(board, depth - 1, alpha, beta, False)
@@ -165,7 +165,7 @@ class MinMaxEngine:
             return max_eval, best_move
 
         else:
-            min_eval = float("inf")
+            min_eval:float = float("inf")
             for move in sorted(board.legal_moves, key=lambda move: self.move_ordering_heuristic(board, move, depth), reverse=True):
                 board.push(move)
                 eval, _ = self.minmax(board, depth - 1, alpha, beta, True)
@@ -173,7 +173,7 @@ class MinMaxEngine:
                 logger.debug(f"Minimizing: Move {move} has eval {eval}\n")
 
                 # should be removed?
-                if eval == 9999 or eval == -9999:
+                if eval == float('inf') or eval == float('-inf'):
                     return eval, move
 
                 if eval < min_eval:
