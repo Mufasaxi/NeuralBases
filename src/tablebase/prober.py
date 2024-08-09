@@ -6,7 +6,7 @@ import logging
 class Prober:
 
     def __init__(self):
-        self.TABLEBASE_PATH = "./endgame_tablebase"
+        self.TABLEBASE_PATH = "../../endgame_tablebase"
 
         # Initialise the tablebase reader
         self.tablebase = chess.syzygy.open_tablebase(self.TABLEBASE_PATH)

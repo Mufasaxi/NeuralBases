@@ -1,4 +1,4 @@
-from src.prober import Prober
+from src.tablebase.prober import Prober # This doesn't work for some reason running "python -m pytest tests/prober_test.py" in cmd from root works.
 
 prober: Prober = Prober()
 
