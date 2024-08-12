@@ -88,5 +88,11 @@ class FenGen():
 
 if __name__ == '__main__':
     fenGen = FenGen()
-    for _ in range(5):
-        print(fenGen.makefen())
+    # for _ in range(5):
+    #     print(fenGen.makefen())
+
+    import chess
+    board = chess.Board(fenGen.make_fen())
+    map = board.piece_map()
+    print(board)
+    print(map)
