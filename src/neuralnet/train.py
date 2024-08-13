@@ -67,7 +67,7 @@ def predict(model, input_tensor):
 def main():
     batch_size = 64
     learning_rate = 0.001
-    num_epochs = 10
+    num_epochs = 50
 
     if os.path.exists("X_data.npy") and os.path.exists("y_data.npy"):
         X, y = load_data("X_data.npy", "y_data.npy")
@@ -95,12 +95,13 @@ def main():
         print(f"Train Loss: {train_loss: .4f}")
         print(f"Val Loss: {val_loss: .4f}, Val Accuracy: {val_accuracy: .4f}")
 
-    torch.save(model.state_dict(), 'endgame_cnn.pth')
+    torch.save(model.state_dict(), 'endgame_cnn50EPOCHS.pth')
 
 
 
 if __name__ == "__main__":
-    model = load_model("endgame_cnn.pth")
+    # main()
+    model = load_model("endgame_cnn50EPOCHS.pth")
     fen_string = "2K5/4q3/8/3B4/k7/8/8/8 w - - 0 1"
     input_tensor = fen_to_tensor(fen_string)
     prediction = predict(model, input_tensor)
