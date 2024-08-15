@@ -8,9 +8,6 @@ from fenParser import board_to_matrix
 import os
 import logging
 
-# TODO: Add type hinting and formatting to model train and dataset files
-# TODO: Add option to insert FEN from terminal
-
 def train(model, train_loader, criterion, optimiser, device) -> int:
     """
     Trains an instance of the EndgameModel using the given training data and the given criterion, and optimiser.
