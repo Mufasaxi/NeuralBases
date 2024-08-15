@@ -5,29 +5,52 @@ from torch.utils.data import DataLoader
 from dataset import EndgamesDataset, load_data, create_data
 from model import EndgameModel
 from fenParser import board_to_matrix
-import chess
 import os
+import logging
 
 # TODO: Add type hinting and formatting to model train and dataset files
 # TODO: Add option to insert FEN from terminal
 
-def train(model, train_loader, criterion, optimiser, device):
+def train(model, train_loader, criterion, optimiser, device) -> int:
+    """
+    Trains an instance of the EndgameModel using the given training data and the given criterion, and optimiser.
+
+    Parameters:
+        model: Instance of EndgameModel
+        train_loader: DataLoader for training data
+        criterion: Loss function
+        optimiser: Any available optimiser from torch.optim
+        device: Device on which the model will be trained. Can be "cpu" or "cuda" depending on the available resources
+
+    Returns:
+        train_loss: Training loss of one training iteration
+    """
     model.train()
     running_loss = 0.0
     for i , (inputs, labels) in enumerate(train_loader):
         inputs, labels = inputs.to(device), labels.to(device)
         optimiser.zero_grad()
         outputs = model(inputs)
-
-        # print(f"Batch {i}: input shape: {inputs.shape}, labels shape: {labels.shape}, outputs shape: {outputs.shape}")
-
+        logging.debug(f"Batch {i}: input shape: {inputs.shape}, labels shape: {labels.shape}, outputs shape: {outputs.shape}")
         loss = criterion(outputs, labels)
         loss.backward()
         optimiser.step()
         running_loss += loss.item()
     return running_loss / len(train_loader)
 
-def evaluate(model, val_loader, criterion, device):
+def evaluate(model, val_loader, criterion, device) -> int:
+    """
+    Evaluates the trained model using the validation data using the same criterion, and optimiser.
+
+    Parameters:
+        model: The trained model
+        val_loader: DataLoader for validation data
+        criterion: Loss function
+        device: Device on which the model will be trained. Can be "cpu" or "cuda" depending on the available resources
+
+    Returns:
+        val_loss: Validation loss of one validation iteration
+    """
     model.eval()
     running_loss = 0.0
     correct = 0
@@ -45,26 +68,10 @@ def evaluate(model, val_loader, criterion, device):
     accuracy = correct / total
     return running_loss / len(val_loader), accuracy
 
-def load_model(model_path):
-    model = EndgameModel()
-    state_dict = torch.load(model_path, weights_only=True)
-    model.load_state_dict(state_dict)
-    model.eval()
-    return model
-
-def fen_to_tensor(fen):
-    board_matrix = board_to_matrix(chess.Board(fen))
-    input_tensor = torch.FloatTensor(board_matrix).unsqueeze(0)
-    return input_tensor
-
-def predict(model, input_tensor):
-    with torch.no_grad():
-        output = model(input_tensor)
-        _, predicted = output.max(1)
-    return predicted.item() - 2
-
-
 def main():
+    """
+    Trains, and validates the model with the respective data. Outputs the training and validation loss for each epoch alongside the validation accuracy
+    """
     batch_size = 64
     learning_rate = 0.001
     num_epochs = 50
@@ -98,13 +105,5 @@ def main():
     torch.save(model.state_dict(), 'endgame_cnn50EPOCHS.pth')
 
 
-
 if __name__ == "__main__":
-    # main()
-    model = load_model("endgame_cnn50EPOCHS.pth")
-    fen_string = "2K5/4q3/8/3B4/k7/8/8/8 w - - 0 1"
-    input_tensor = fen_to_tensor(fen_string)
-    prediction = predict(model, input_tensor)
-
-    print(f"Input FEN: 2K5/4q3/8/3B4/k7/8/8/8 w - - 0 1")
-    print(f"Predicted WDL: {prediction}")
+    main()

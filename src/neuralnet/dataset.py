@@ -12,13 +12,27 @@ from fenParser import create_nn_input
 class EndgamesDataset(Dataset):
 
     def __init__(self, X, y):
+        """
+        Defines the Tensors for the data
+
+        Parameters:
+        X: array for the inputs, that will be stored as  pytorch FloatTensor
+        y: array of the outputs for each value in X, that will be stored as pytorch LongTensor
+
+        """
         self.X = torch.FloatTensor(X)
         self.y = torch.LongTensor(y+2)
 
     def __len__(self) -> int:
+        """
+        Returns the lenght of the y tensor (which should be the same as the length of X)
+        """
         return len(self.y)
     
-    def __getitem__(self, index: int) -> tuple[int, int]:
+    def __getitem__(self, index: int) -> tuple[list[int], int]:
+        """
+        Returns the i-th element of X and y as a tuple
+        """
         return self.X[index], self.y[index]
     
 def process_batch(_, batch_size, fenGen):
@@ -26,6 +40,11 @@ def process_batch(_, batch_size, fenGen):
     return create_nn_input(fens)
 
 def create_data():
+    """
+    Creates 1000000 sample endgame positions and their respective WDL. X contains the matrix board representation of an endgame FEN, while y contains the respective WDL evaluation.
+
+    Both X and y are saved as .npy files named "X_data.npy" and "y_data.npy" respectively.
+    """
     total_fens = 1000000
     batch_size = 1000
     num_batches = total_fens // batch_size
@@ -55,6 +74,16 @@ def create_data():
 
     
 def load_data(x_path, y_path):
+    """
+    Loads the saved .npy into np arrays and returns them
+
+    Parameters:
+        x_path: path to X_data.npy file
+        y_path: path to y_data.npy file
+
+    Returns:
+    NP Arrays of X and y as tuple
+    """
     X = np.load(x_path)
     y = np.load(y_path)
     return X, y

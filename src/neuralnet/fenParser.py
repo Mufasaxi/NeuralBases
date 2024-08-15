@@ -2,7 +2,13 @@ import numpy as np
 import chess
 import chess.syzygy
 def board_to_matrix(board: chess.Board):
+    """
+    Takes a chess.Board instance and returns a (12, 8, 8) matrix representing it.
 
+    The first 6 8x8 matrices are the white pawn, knight, bishop, rook, queen, and king, the second set of 6 are the black pieces in the same order.
+
+    Each 8x8 matrix is a bitboard for the respective piece
+    """
     matrix = np.zeros((12, 8, 8))
     piece_map = board.piece_map()
 
@@ -14,6 +20,11 @@ def board_to_matrix(board: chess.Board):
     return matrix
 
 def create_nn_input(fens: list[str]):
+    """
+    Takes a list of FENs as input, and for each element, creates an element in the array X representing the matrix representation of the FEN board, and another element in the array y representing the WDL of the board.
+
+    Returns X, y as a tuple of np.arrays
+    """
     X = []
     y = []
     # TABLEBASE_PATH = "/../endgame_tablebase"
