@@ -1,0 +1,32 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+\usepackage{geometry}
+\usepackage{lipsum}
+\usepackage{relsize}
+\usepackage{float}
+\usepackage{hyperref}
+
+\newgeometry{vmargin={30mm}, hmargin={30mm,30mm}}
+
+\title{Beyond Tablebases \\[0.5em]\smaller{} Utilising Neural Networks for Efficient Chess Endgame Resolution}
+\author{Mustafa Abdalla}
+\date{July 2024}
+
+\begin{document}
+
+\maketitle
+
+\newpage
+\tableofcontents
+
+\input{sections/0_Abstract}
+\input{sections/1_Intro}
+\input{sections/2_ChessProgramming}
+\input{sections/3_Tablebases}
+\input{sections/4_NeuralNets}
+
+\newpage
+\bibliographystyle{plain}
+\bibliography{bib.bib}
+
+\end{document}

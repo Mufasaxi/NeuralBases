@@ -1,0 +1,45 @@
+\section{Neural Networks in Chess}
+\label{sec:NeuralNets}
+
+Over the last decade computer engines went from consisting of intelligent efficient search and evaluation algorithms, to being focused on creating larger, and intricate neural network architectures that could reach newer heights when it comes to accuracy and general strength of play. Examples of this include the previously mentioned Stockfish \cite{stockfish2024} and AlphaZero \textbf{REF TO ALPHA ZERO}. The prior being an amalgamation of using algorithms like MinMax \& Alpha-Beta Pruning \ref{sec:Chess Programming} to guide the neural network in finding the most optimal move, while the latter being made up of a neural network that teaches itself the game of chess without prior outside knowledge, using techniques like Monte Carlo Tree Search \textbf{REF TO MCTS}. Both approaches present the different paradigms of creating a strong chess engine, which in turn raises the question "How can one make use of these neural networks to improve how Endgames are played by engines?"
+
+\subsection{Overview}
+The main objective of this paper, as highlighted by its title, is to explore how neural networks can be used as a replacement to endgame tablebases in the hope of finding benefits when it comes to the speed of probing, but more importantly to save on the storage space required by the tablebases. For the sake of simplicity and lack of resources, this paper will look into one metric provided by tablebases, and using a neural network in place of the tablebase for probing.
+
+More concretely, the objective is to design a neural network that given a chess position can predict the correct WDL value. Once this is proven feasible, the other metrics can be predicted by the same process. 
+
+\subsection{Pattern Recognition}
+Similar to the approach of considering how a Grandmaster would think about the problem of finding the best move in section \ref{sec:Chess Programming} in order to come up with efficient algorithms for finding the best move, using this approach here when given a position and determining the WDL, more abstractly determining whether it is good or bad, can help pinpoint what features make up a position.
+
+In the experiments conducted by de Groot \cite{deGroot} players of varying strength ranging from masters to complete novices were presented with various positions that could arise in a standard game of chess and were given the task of reproducing the position on an empty board after viewing it for a short period of time (3-10 seconds). On average, it was found that master level players were able to more accurately reproduce the position with only a couple of pieces being misplaced if at all, while novice players showcased having a larger margin of error when recreating the given positions.
+
+On first glance, one could hypothesise that since a master player has spent a long period of time in contact with chess positions that their memory for remembering such positions would be better compared to that of a novice player. Nevertheless, this would be disproven when considering the second set of experiments conducted.
+
+In the second set of experiments both the master and novice player where once again presented with the same task, but this time instead of the positions being those that could come up in a standard game, the players were presented positions where the pieces were placed completely randomly. This time around, the accuracy of the master players significantly dropped in contrast to the first experiment, and was barely better than that of the novice players.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.45]{images/MorphyPosition.png}
+    \caption{Example of a position that could arise in a game}
+    \label{MorphyPosition}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.45]{images/RandomPosition.png}
+    \caption{Example of a position where the pieces are randomly placed}
+    \label{RandomPosition}
+\end{figure}
+
+Figures \ref{MorphyPosition} \& \ref{RandomPosition} show visually what a position that could arise from a game, and a random position look like. In fig.\ref{MorphyPosition} a master player would look at symmetrical pawn structure of white, at the e4 pawn being attacked by the Knight, and the pins (meaning a piece can or should not move when being attacked due to it covering a piece of greater value) placed on the d7 Rook and f6 Knight by the b5 and g5 Bishops respectively. While in fig.\ref{RandomPosition} the pieces are not \textit{harmonious} with each other and are scattered haphazardly, making it harder to extract the relations and patterns between them. Figure \ref{MorphyAnotated} demonstrates this.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.45]{images/MorphyAnotated.png}
+    \caption{The patterns a master player would see when observing the position in fig.\ref{MorphyPosition}}
+    \label{MorphyAnotated}
+\end{figure}
+
+The process just described is exactly what needs to be done by the neural networks, in order to extract the essential features like pawn structures, relative positions of the pieces to each other, and many more so that it can make an accurate estimation about whether a position is good or not. In simpler words, we need a neural network good at recognising patterns.
+
+\subsection{Convolutional Neural Networks}
