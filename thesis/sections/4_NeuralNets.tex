@@ -43,3 +43,16 @@ Figures \ref{MorphyPosition} \& \ref{RandomPosition} show visually what a positi
 The process just described is exactly what needs to be done by the neural networks, in order to extract the essential features like pawn structures, relative positions of the pieces to each other, and many more so that it can make an accurate estimation about whether a position is good or not. In simpler words, we need a neural network good at recognising patterns.
 
 \subsection{Convolutional Neural Networks}
+
+Convolutional Neural Network are a special type of neural network architecture used mainly in the field of image/object recognition. When dealing with a grey-scale image like the ones in the MNIST Classification Dataset \cite{MNIST} one could use the traditional Multi-Layer-Perceptron \textbf{REF TO MLP} where each pixel would have a value ranging from 0 (black) to 255 (white), and the 2x2 grid of pixel would then be converted to a singular 1-dimensional array that is treated as the input of the perceptron, and fully connected to the following hidden layers with the respective weights, biases and activation functions, eventually leading to the output layer containing 10 neurons/nodes each corresponding to a digit 0-9 with the value outputted at each node being the confidence/probability of the given image being the corresponding number represented by the node. \textbf{INSERT FIGURE TO SHOW PROCESS OF MODELLING AS 1D ARRAY AND NEURAL NET}
+
+With sufficient training data, such a model could be very accurate and reliable in several use cases, but one major problem arises, scaling. The MNIST Handwritten Digits Dataset contains images of dimension 28x28, in other words there are 784 individual pixlels that must each correspond to a single neuron. Furthermore, most images processed in the context of image/object recognition are much larger than the measly 28x28 dimensions of the MNIST Dataset, so in the worst case, one would need to adjust the size of the input layer for each type of image to be processed. This alone increases the complexity of the architecture when using greyscale images, let alone coloured ones.
+
+This is where CNNs shine, their architecture allows for variability in the size of the input images without significantly increasing the size or complexity of the model. The process involves the input going through multiple convolutional layers that contain kernels/filters that pass over the image as a whole and create an output matrix known as a feature map. The size of each convolutional layer depends on the size of the convolutional layer preceeding it and its resepctive kernels. The size of the kernels determines what is known as the receptive field. This tells us how much information from the previous layers is propagated through to the current layer. \textbf{ADD FIGURES TO DEMONSTRATE CONVOLUTION AND KERNELS}.
+
+\subsubsection{Convolution}
+\textbf{briefly explain the maths of convolution}
+
+\subsubsection{Kernels}
+\textbf{EXPLAIN KERNEL PASS AND STRIDES AND HOW IT CAN BE USED FOR PATTERN RECOGNITION LIKE EDGE DETECTION}
+
