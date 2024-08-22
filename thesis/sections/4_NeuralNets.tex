@@ -48,11 +48,112 @@ Convolutional Neural Network are a special type of neural network architecture u
 
 With sufficient training data, such a model could be very accurate and reliable in several use cases, but one major problem arises, scaling. The MNIST Handwritten Digits Dataset contains images of dimension 28x28, in other words there are 784 individual pixlels that must each correspond to a single neuron. Furthermore, most images processed in the context of image/object recognition are much larger than the measly 28x28 dimensions of the MNIST Dataset, so in the worst case, one would need to adjust the size of the input layer for each type of image to be processed. This alone increases the complexity of the architecture when using greyscale images, let alone coloured ones.
 
-This is where CNNs shine, their architecture allows for variability in the size of the input images without significantly increasing the size or complexity of the model. The process involves the input going through multiple convolutional layers that contain kernels/filters that pass over the image as a whole and create an output matrix known as a feature map. The size of each convolutional layer depends on the size of the convolutional layer preceeding it and its resepctive kernels. The size of the kernels determines what is known as the receptive field. This tells us how much information from the previous layers is propagated through to the current layer. \textbf{ADD FIGURES TO DEMONSTRATE CONVOLUTION AND KERNELS}.
+This is where CNNs shine, their architecture allows for variability in the size of the input images without significantly increasing the size or complexity of the model. The process involves the input going through multiple convolutional layers that contain kernels/filters that pass over the image as a whole and create an output matrix known as a feature map. The size of each convolutional layer depends on the size of the convolutional layer preceeding it and its resepctive kernels. The size of the kernels determines what is known as the receptive field. This tells us how much information from the previous layers is propagated through to the current layer \cite{lecun2015deep}. \textbf{ADD FIGURES TO DEMONSTRATE CONVOLUTION AND KERNELS}.
 
-\subsubsection{Convolution}
-\textbf{briefly explain the maths of convolution}
+\subsubsection{Convolution \& Kernels}
+Convolution is the fundamental operation that gives CNNs their name and is key to their ability to efficiently process images, or more generally spatial data. In the context of CNNs, convolution is a mathematical operator that involves the input data (such as an image) and the kernel.
+The convolution operation slides the kernel over the input data, performing element-wise multiplication at each position and summing the results to produce a single output value. This process is repeated across the entire input, creating a feature map that highlights particular features or patterns in the data.
+For a 2D input image I and a kernel K, the convolution operation can be expressed as follows:
+\[
+(I * K)(i, j) = \sum_{m} \sum_{n} I(i+m, j+n) \cdot K(m, n)
+\]
+Where $(i,j)$ represents the position in the output feature map, and $(m,n)$ are the coordinates within the kernel.
+Let's consider a simple example to illustrate this process:
+Suppose we have a 5x5 input image and a 3x3 kernel:
+Input Image:
+\[
+\begin{bmatrix}
+1 & 1 & 1 & 0 & 0 \\
+0 & 1 & 1 & 1 & 0 \\
+0 & 0 & 1 & 1 & 1 \\
+0 & 0 & 1 & 1 & 0 \\
+0 & 1 & 1 & 0 & 0 \\
+\end{bmatrix}
+\]
+Kernel:
+\[
+\begin{bmatrix}
+1 & 0 & 1 \\
+0 & 1 & 0 \\
+1 & 0 & 1 \\
+\end{bmatrix}
+\]
+To compute the first element of the output feature map, we would perform the following calculation:
+\[
+(1 \cdot 1) + (1 \cdot 0) + (1 \cdot 1) + (0 \cdot 0) + (1 \cdot 1) + (1 \cdot 0) + (0 \cdot 1) + (0 \cdot 0) + (0 \cdot 1) = 4
+\]
+The kernel then slides over by one position (the stride), and the process is repeated. The final output feature map for this example would be:
+\[
+\begin{bmatrix}
+4 & 3 & 4 \\
+2 & 4 & 3 \\
+2 & 3 & 4\\
+\end{bmatrix}
+\]
+This example demonstrates how convolution can detect patterns or features. In this case, the kernel is sensitive to diagonal patterns in the input image.
+In practice, CNNs use multiple kernels to detect various features, and the convolution operation is typically followed by a non-linear activation function. The kernels' values are learned during the training process, allowing the network to automatically discover important features for the task at hand.
 
-\subsubsection{Kernels}
-\textbf{EXPLAIN KERNEL PASS AND STRIDES AND HOW IT CAN BE USED FOR PATTERN RECOGNITION LIKE EDGE DETECTION}
+The kernels used within the first several layers are basic like the one used in this example, they can be used for edge detection (whether horizontal or vertical), corner detection, and many other things. Deeper within the architecture of CNNs the kernels begin extracting features that are more abstract and harder to make sense out of, for us as humans.
 
+\subsubsection{Pooling layers \& Padding}
+From the example above, one could notice that the convolution of the 5x5 input matrix using a 3x3 kernel, resulted in a feature map output matrix of dimension 3x3. In other words, the essence of the original input matrix (\textit{i.e. image}) was extracted into a smaller matrix. Depending on the situation this extraction into smaller matrices containing the bare minimum when it comes to essential features can be taken further by introducing the concept of pooling \cite{lecun2015deep}.
+
+Briefly, pooling combines features that are similar, in other words in close proximity to one another, and spits out a number that is representative of them. There are 2 types of pooling layers that are commonly used across most CNNS.
+
+\begin{itemize}
+    \item Average Pooling Layers
+    \item Max Pooling Layers
+\end{itemize}
+
+Similar to the use of kernels, in Average Pooling Layers a filter is passed over the elements of the convolved input and the average of these elements is then outputted as a single element of the output matrix. Max Pooling Layers work analogously but take the maximum element instead of an average.
+
+Suppose we have a 4x4 input matrix (which could be the output of a previous convolutional layer):
+\[
+\begin{bmatrix}
+1 & 3 & 1 & 1 \\
+2 & 8 & 2 & 0 \\
+0 & 4 & 3 & 2 \\
+6 & 1 & 0 & 3 \\
+\end{bmatrix}
+\]
+We'll apply both max pooling and average pooling with a 2x2 filter and a stride of 2.
+\textbf{Max Pooling:}
+For max pooling, we take the maximum value in each 2x2 region:
+\[
+\begin{bmatrix}
+\max(1,3,2,8) & \max(1,1,2,0) \\
+\max(0,4,6,1) & \max(3,2,0,3)\\
+\end{bmatrix} =
+\begin{bmatrix}
+8 & 2 \\
+6 & 3 \\
+\end{bmatrix}
+\]
+\textbf{Average Pooling:}
+For average pooling, we take the average value in each 2x2 region:
+\[
+\begin{bmatrix}
+\frac{1+3+2+8}{4} & \frac{1+1+2+0}{4} \\
+\frac{0+4+6+1}{4} & \frac{3+2+0+3}{4} \\
+\end{bmatrix} =
+\begin{bmatrix}
+3.5 & 1 \\
+2.75 & 2 \\
+\end{bmatrix}
+\]
+Both pooling operations reduce the spatial dimensions of the input. Max pooling tends to highlight the strongest features, while average pooling provides a smoother representation of the features.
+Padding is another important concept in CNNs. It involves adding extra rows and columns of zeros (or other values) around the input matrix. This is often done to preserve the spatial dimensions after convolution or to ensure that the filter can be applied to border pixels. For example, if we add a padding of 0 to our original 4x4 input, we get:
+\[
+\begin{bmatrix}
+0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 1 & 3 & 1 & 1 & 0 \\
+0 & 2 & 8 & 2 & 0 & 0 \\
+0 & 0 & 4 & 3 & 2 & 0 \\
+0 & 6 & 1 & 0 & 3 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 \\
+\end{bmatrix}
+\]
+This padding allows us to apply a 3x3 convolution while maintaining the original 4x4 output dimensions.
+
+\subsubsection{The Classifier}
+\textbf{EXPLAIN FULLY CONNECTED LAYERS AT THE END}
