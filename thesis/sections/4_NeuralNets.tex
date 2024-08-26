@@ -9,6 +9,7 @@ The main objective of this paper, as highlighted by its title, is to explore how
 More concretely, the objective is to design a neural network that given a chess position can predict the correct WDL value. Once this is proven feasible, the other metrics can be predicted by the same process. 
 
 \subsection{Pattern Recognition}
+\label{subsec:PattRec}
 Similar to the approach of considering how a Grandmaster would think about the problem of finding the best move in section \ref{sec:Chess Programming} in order to come up with efficient algorithms for finding the best move, using this approach here when given a position and determining the WDL, more abstractly determining whether it is good or bad, can help pinpoint what features make up a position.
 
 In the experiments conducted by de Groot \cite{deGroot} players of varying strength ranging from masters to complete novices were presented with various positions that could arise in a standard game of chess and were given the task of reproducing the position on an empty board after viewing it for a short period of time (3-10 seconds). On average, it was found that master level players were able to more accurately reproduce the position with only a couple of pieces being misplaced if at all, while novice players showcased having a larger margin of error when recreating the given positions.
@@ -43,7 +44,6 @@ Figures \ref{MorphyPosition} \& \ref{RandomPosition} show visually what a positi
 The process just described is exactly what needs to be done by the neural networks, in order to extract the essential features like pawn structures, relative positions of the pieces to each other, and many more so that it can make an accurate estimation about whether a position is good or not. In simpler words, we need a neural network good at recognising patterns.
 
 \subsection{Convolutional Neural Networks}
-
 Convolutional Neural Network are a special type of neural network architecture used mainly in the field of image/object recognition. When dealing with a grey-scale image like the ones in the MNIST Classification Dataset \cite{MNIST} one could use the traditional Multi-Layer-Perceptron \textbf{REF TO MLP} where each pixel would have a value ranging from 0 (black) to 255 (white), and the 2x2 grid of pixel would then be converted to a singular 1-dimensional array that is treated as the input of the perceptron, and fully connected to the following hidden layers with the respective weights, biases and activation functions, eventually leading to the output layer containing 10 neurons/nodes each corresponding to a digit 0-9 with the value outputted at each node being the confidence/probability of the given image being the corresponding number represented by the node. \textbf{INSERT FIGURE TO SHOW PROCESS OF MODELLING AS 1D ARRAY AND NEURAL NET}
 
 With sufficient training data, such a model could be very accurate and reliable in several use cases, but one major problem arises, scaling. The MNIST Handwritten Digits Dataset contains images of dimension 28x28, in other words there are 784 individual pixlels that must each correspond to a single neuron. Furthermore, most images processed in the context of image/object recognition are much larger than the measly 28x28 dimensions of the MNIST Dataset, so in the worst case, one would need to adjust the size of the input layer for each type of image to be processed. This alone increases the complexity of the architecture when using greyscale images, let alone coloured ones.
@@ -156,4 +156,60 @@ Padding is another important concept in CNNs. It involves adding extra rows and 
 This padding allows us to apply a 3x3 convolution while maintaining the original 4x4 output dimensions.
 
 \subsubsection{The Classifier}
-\textbf{EXPLAIN FULLY CONNECTED LAYERS AT THE END}
+Following the convolutional and pooling layers, CNNs typically incorporate one or more fully connected (FC) layers, also known as dense layers. These layers serve as the "classifier" part of the network and play a crucial role in interpreting the high-level features extracted by the preceding layers.
+In a fully connected layer, each neuron is connected to every neuron in the previous layer, hence the name "fully connected". This structure allows the network to combine global information across the entire feature space, as opposed to the local focus of convolutional layers.
+The primary functions of these FC layers include:
+\begin{itemize}
+\item \textbf{Feature integration:} FC layers combine local features detected by convolutional layers to form a global understanding of the input.
+\item \textbf{Non-linear mapping:} When combined with non-linear activation functions, FC layers can model complex, non-linear relationships between features and target outputs.
+\item \textbf{Dimensionality reduction:} FC layers often progressively reduce the dimensionality of the data, distilling the most relevant information for the final prediction.
+\item \textbf{Task-specific output:} The final FC layer is designed to produce outputs suitable for the specific task at hand, such as classification probabilities or regression values.
+\end{itemize}
+For instance, in a classification task, the output of the final FC layer typically has neurons corresponding to each possible class. A softmax activation function is often applied to this layer to produce a probability distribution over the classes.
+Mathematically, the operation in a fully connected layer can be expressed as:
+
+\[
+y = f(Wx + b)
+\]
+
+Where $x$ is the input vector, $W$ is the weight matrix, $b$ is the bias vector, $f$ is the activation function, and $y$ is the output vector \cite{Klein}.
+
+It's worth noting that while FC layers provide powerful classification capabilities, they also introduce a large number of parameters to the network. For example, if a convolutional layer outputs a feature map of size 7x7x512, and the first FC layer has 4096 neurons, this single connection would require 7 * 7 * 512 * 4096 = 102,760,448 parameters. This can lead to increased computational requirements and potential overfitting, especially with limited training data \cite{DBLP:journals/corr/abs-1902-02771}.
+To mitigate these issues, techniques such as dropout (randomly setting a fraction of inputs to zero during training) are often employed in FC layers. Additionally, some modern architectures have experimented with replacing FC layers with global average pooling, which can drastically reduce the number of parameters while still maintaining good performance.
+In the context of transfer learning, the FC layers are often the only parts retrained when adapting a pre-trained CNN to a new task. This allows the network to leverage the general features learned from a large dataset while fine-tuning the final classification for the specific task at hand.
+
+Understanding the role and behavior of fully connected layers is crucial for effectively designing and training CNNs, as they form the bridge between the automated feature extraction of convolutional layers and the final task-specific predictions of the network.
+
+\subsection{Images within Chess}
+For the reader, the previous section may seem to have went off on a tangent away from chess and the topic of this paper, but the connection shall be made clear in the paragraphs to follow.
+
+As mentioned in \ref{subsec:PattRec}, the essence of chess mastery lies within recognising patterns, and the previous section outlined how CNNs can be used exactly for that task. It is now only a matter of modelling the problem in a clever way to be able to make use of these CNNs.
+
+\subsubsection{Bitboards}
+Consider a black and white image. It can be viewed as grid, modelled as a 2-dimensional array of pixels where each pixel has either a value of 1 (white) or 0 (black). Similarly, a chess position can be modelled in a similar manner. Assume, we have a board containing only white pawns. The board is a grid of squares/fields, modelled as a 2-dimensional array where each square has either a value of 1 (contains a white pawn) or 0 (does not contain a white pawn). This is what bitboards are \cite{BitBoards}. Figure \ref{fig: pawnBitboards} provides a visual example
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.25]{images/PawnBitboard.png}
+    \includegraphics[scale=0.26]{images/PawnBitboardVals.png}
+    \caption{Bitboard representation of the white pawns on the board}
+    \label{fig: pawnBitboards}
+\end{figure}
+
+To represent a colour image, each pixel component (Red, Green, or Blue) is stored on a seperate "channel", this allows for dealing with each channel as a single layer in the case of grey-scale images, but instead of 0 being black and 255 being white, 255 would be the colour of the respective channel.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.5]{images/RGBtoChannels.png}
+    \caption{Decomposition of an RGB Image to Three Channels}
+    \label{fig: RGBChannels}
+\end{figure}
+
+To represent an entire chess position one would need \textit{at least} 16 bitboards, one for each unique piece (white King, black King, white Queen, black Queen, and so on). Figure \ref{fig: Bitboards} shows a simplified version of this.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.75]{images/BitboardDecomp.png}
+    \caption{Decomposition of a position into various bitboards (here as actual pieces for simiplicity)}
+    \label{fig: Bitboards}
+\end{figure}
