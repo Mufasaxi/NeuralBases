@@ -4,10 +4,8 @@ Code base for my Bachelor Thesis about comparing and evaluating the traditional 
 ## Setup
 The project should ideally be ran on a virtual environment to avoid conflicts with locally existing versions of the used packages and libraries.
 
-```diff
--**DISCLAIMER**-
-```
-The source code depends on having the Syzygy 6 man Tablebase locally, and the [Downloader](https://github.com/Mufasaxi/NeuralBases/blob/main/downloader.py) is responsible for that, but this may take a significant amount of time, and requires somewhere around 70GBs of storage space. 
+> [!DISCLAIMER]
+>The source code depends on having the Syzygy 6 man Tablebase locally, and the [Downloader](https://github.com/Mufasaxi/NeuralBases/blob/main/downloader.py) is responsible for that, but this may take a significant amount of time, and requires somewhere around 70GBs of storage space. 
 
 ### Initialising the virtual environment
 For this project virtualenv was used, but any other virtual environment should work.
