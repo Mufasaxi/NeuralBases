@@ -55,7 +55,7 @@ if __name__ == '__main__':
     fen_string = input("Enter an FEN: ") #"2k5/4q3/8/3b4/k7/8/8/8 w - - 0 1"
     input_tensor = fen_to_tensor(fen_string)
     prediction = predict(model, input_tensor)
-    print(f"Input FEN: 2K5/4q3/8/3B4/k7/8/8/8 w - - 0 1")
+    print(f"Input FEN: {fen_string}") 
     print(chess.Board(fen_string))
     print(f"Predicted WDL (50 Epoch Model): {prediction}")
     mode = load_model("endgame_cnn.pth")
