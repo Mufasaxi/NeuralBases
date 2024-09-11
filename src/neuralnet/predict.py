@@ -1,7 +1,9 @@
 from model import EndgameModel
 from fenParser import board_to_matrix
 import chess
+import chess.syzygy
 import torch
+import time
 
 def load_model(model_path: str) -> EndgameModel:
     """
@@ -51,13 +53,29 @@ def predict(model: EndgameModel, input_tensor: torch.Tensor) -> int:
     return predicted.item() - 2
 
 if __name__ == '__main__':
-    model = load_model("endgame_cnn50epochs.pth")
     fen_string = input("Enter an FEN: ") #"2k5/4q3/8/3b4/k7/8/8/8 w - - 0 1"
     input_tensor = fen_to_tensor(fen_string)
+    
+    time_start_50Epoch_prediction = time.monotonic()
+    model = load_model("endgame_cnn50epochs.pth") 
     prediction = predict(model, input_tensor)
+    time_end_50Epoch_prediction = time.monotonic()
+    prediction_time_50Epoch = time_end_50Epoch_prediction - time_start_50Epoch_prediction
+
     print(f"Input FEN: {fen_string}") 
     print(chess.Board(fen_string))
-    print(f"Predicted WDL (50 Epoch Model): {prediction}")
-    mode = load_model("endgame_cnn.pth")
+    print(f"Predicted WDL (50 Epoch Model): {prediction} ({prediction_time_50Epoch:.3f} s)")
+    
+    time_start_10Epoch_prediction = time.monotonic()
+    model = load_model("endgame_cnn.pth")
     prediction = predict(model, input_tensor)
-    print(f"Predicted WDL (10 Epoch Model): {prediction}")
+    time_end_10Epoch_prediction = time.monotonic()
+    prediction_time_10Epoch = time_end_10Epoch_prediction - time_start_10Epoch_prediction
+    print(f"Predicted WDL (10 Epoch Model): {prediction} ({prediction_time_10Epoch:.3f} s)")
+    
+    time_start_tablebase = time.monotonic()
+    tablebase = chess.syzygy.open_tablebase("D:/musta/Github Projects/NeuralBases/endgame_tablebase")
+    time_end_tablebase = time.monotonic()
+    probing_time_tablebase = time_end_tablebase - time_start_tablebase
+    wdl = tablebase.probe_wdl(chess.Board(fen_string))
+    print(f"Actual WDL: {wdl} ({probing_time_tablebase:.3f} s)")

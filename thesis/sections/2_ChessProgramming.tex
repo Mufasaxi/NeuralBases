@@ -113,7 +113,7 @@ MinMax is an approach that can be applied to any 2 player game, and not just che
         \end{itemize}
 \end{itemize}
 
-The following figure shows the outcome of following the aforementioned steps, keeping in mind that the moves considered here are mostly piece captures, and alongside that the evaluation function used just sums up the value of the pieces.
+The following Figure shows the outcome of following the aforementioned steps, keeping in mind that the moves considered here are mostly piece captures, and alongside that the evaluation function used just sums up the value of the pieces.
 
 \begin{figure}[h]
     \centering
@@ -132,7 +132,7 @@ Consider that we are deep in our move tree, and white is to move. Assuming we ha
 
 When evaluating the first child of Node 2 we come across an evaluation of 6, so now we know that Node 2 would have an evaluation of \textit{at least} 6. At this point we can say that Node 1 has an evaluation of +2 and Node 2 has an evaluation of $\geq+5$. But we know that in the turn that precedes Node 1 and Node 2, it was black's turn to move, and black would try to minimise the score and thus choose Node 1. With that information we can now confidently say that looking further into the children of Node 2 is no longer necessary and prune those branches off.
 
-Figure \ref{minAB} \cite{Klein} shows the application Alpha-Beta Pruning alongside the MinMax algorithm, its application on figure \ref{minmax}
+Figure \ref{minAB} \cite{Klein} shows the application Alpha-Beta Pruning alongside the MinMax algorithm, its application on Figure \ref{minmax}
 
 \begin{figure}[h]
     \centering
@@ -144,7 +144,7 @@ Figure \ref{minAB} \cite{Klein} shows the application Alpha-Beta Pruning alongsi
 
 
 \subsubsection{Move ordering}
-In section \ref{subsubsec: Heuristics} it was mentioned that candidate moves are the ones that have priority when looking for the best move in a position. This means that generating moves that satisfy or follow certain heuristics and evaluating them first would lead to a quicker termination of the search function.
+In Section \ref{subsubsec: Heuristics} it was mentioned that candidate moves are the ones that have priority when looking for the best move in a position. This means that generating moves that satisfy or follow certain heuristics and evaluating them first would lead to a quicker termination of the search function.
 
 This can be done using some form of a priority queue. An example of this is made clear with table \ref{tab:heuristicPriorityTable}
 

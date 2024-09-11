@@ -10,7 +10,7 @@ More concretely, the objective is to design a neural network that given a chess 
 
 \subsection{Pattern Recognition}
 \label{subsec:PattRec}
-Similar to the approach of considering how a Grandmaster would think about the problem of finding the best move in section \ref{sec:Chess Programming} in order to come up with efficient algorithms for finding the best move, using this approach here when given a position and determining the WDL, more abstractly determining whether it is good or bad, can help pinpoint what features make up a position.
+Similar to the approach of considering how a Grandmaster would think about the problem of finding the best move in Section \ref{sec:Chess Programming} in order to come up with efficient algorithms for finding the best move, using this approach here when given a position and determining the WDL, more abstractly determining whether it is good or bad, can help pinpoint what features make up a position.
 
 In the experiments conducted by de Groot \cite{deGroot} players of varying strength ranging from masters to complete novices were presented with various positions that could arise in a standard game of chess and were given the task of reproducing the position on an empty board after viewing it for a short period of time (3-10 seconds). On average, it was found that master level players were able to more accurately reproduce the position with only a couple of pieces being misplaced if at all, while novice players showcased having a larger margin of error when recreating the given positions.
 
@@ -32,12 +32,12 @@ In the second set of experiments both the master and novice player where once ag
     \label{RandomPosition}
 \end{figure}
 
-Figures \ref{MorphyPosition} \& \ref{RandomPosition} show visually what a position that could arise from a game, and a random position look like. In fig.\ref{MorphyPosition} a master player would look at symmetrical pawn structure of white, at the e4 pawn being attacked by the Knight, and the pins (meaning a piece can or should not move when being attacked due to it covering a piece of greater value) placed on the d7 Rook and f6 Knight by the b5 and g5 Bishops respectively. While in fig.\ref{RandomPosition} the pieces are not \textit{harmonious} with each other and are scattered haphazardly, making it harder to extract the relations and patterns between them. Figure \ref{MorphyAnotated} demonstrates this.
+Figures \ref{MorphyPosition} \& \ref{RandomPosition} show visually what a position that could arise from a game, and a random position look like. In Fig.\ref{MorphyPosition} a master player would look at symmetrical pawn structure of white, at the e4 pawn being attacked by the Knight, and the pins (meaning a piece can or should not move when being attacked due to it covering a piece of greater value) placed on the d7 Rook and f6 Knight by the b5 and g5 Bishops respectively. While in Fig.\ref{RandomPosition} the pieces are not \textit{harmonious} with each other and are scattered haphazardly, making it harder to extract the relations and patterns between them. Figure \ref{MorphyAnotated} demonstrates this.
 
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.45]{images/MorphyAnotated.png}
-    \caption{The patterns a master player would see when observing the position in fig.\ref{MorphyPosition}}
+    \caption{The patterns a master player would see when observing the position in Fig.\ref{MorphyPosition}}
     \label{MorphyAnotated}
 \end{figure}
 
@@ -165,7 +165,7 @@ The primary functions of these FC layers include:
 \item \textbf{Dimensionality reduction:} FC layers often progressively reduce the dimensionality of the data, distilling the most relevant information for the final prediction.
 \item \textbf{Task-specific output:} The final FC layer is designed to produce outputs suitable for the specific task at hand, such as classification probabilities or regression values.
 \end{itemize}
-For instance, in a classification task, the output of the final FC layer typically has neurons corresponding to each possible class. A softmax activation function is often applied to this layer to produce a probability distribution over the classes.
+For instance, in a classification task, the output of the final FC layer typically has neurons corresponding to each possible class. A softmax activation function \cite{Softmax} is often applied to this layer to produce a probability distribution over the classes.
 Mathematically, the operation in a fully connected layer can be expressed as:
 
 \[
@@ -196,7 +196,7 @@ Consider a black and white image. It can be viewed as grid, modelled as a 2-dime
     \label{fig: pawnBitboards}
 \end{figure}
 
-To represent a colour image, each pixel component (Red, Green, or Blue) is stored on a seperate "channel", this allows for dealing with each channel as a single layer in the case of grey-scale images, but instead of 0 being black and 255 being white, 255 would be the colour of the respective channel.
+To represent a colour image, each pixel component (Red, Green, or Blue) is stored on a separate "channel", this allows for dealing with each channel as a single layer in the case of grey-scale images, but instead of 0 being black and 255 being white, 255 would be the colour of the respective channel.
 
 \begin{figure}[H]
     \centering
@@ -210,6 +210,185 @@ To represent an entire chess position one would need \textit{at least} 16 bitboa
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.75]{images/BitboardDecomp.png}
-    \caption{Decomposition of a position into various bitboards (here as actual pieces for simiplicity)}
+    \caption{Decomposition of a position into various bitboards (here as actual pieces for simplicity)}
     \label{fig: Bitboards}
 \end{figure}
+
+With that we get a decomposition of what could be a complex chess position into its bare constituents separated over their respective channels, and from that the CNN would be able to come up with its own abstract filter/kernels to make sense and create relations out of the pieces and their positions in order to be able to come up with a concrete value of whether the given position is winning, drawn, or losing for the side to move.
+
+\subsection{Architecture}
+The CNN architecture chosen is designed to process 12-channel 8x8 input "images". The network consists of three convolutional layers followed by two fully connected layers. The individual layers of the model are visualised in Figure \ref{fig: CNNArch} and are explained below \footnote{It may seem that some kernels are larger than their respecive layers, but this is due to the omission of padding in the visualisation}:
+
+\begin{itemize}
+    \item Input Layer:
+    \begin{itemize}
+        \item Dimensions: 12 x 8 x 8
+        \item The 12 channels each represent the position of a unique type of chess piece on the 8x8 chessboard.
+    \end{itemize}
+
+    \newpage
+    
+    \item Convolutional Layers:
+    \begin{itemize}
+        \item Conv1: $12 \rightarrow 64$ channels, 3x3 kernel, padding=1
+        \item Conv2: $64 \rightarrow 128$ channels, 3x3 kernel, padding=1
+        \item Conv3: $128 \rightarrow 256$ channels, 3x3 kernel, padding=1
+
+        In most modern CNN architectures the number of channels tends to incrementally increase, in order to allow for more complex patterns to be captured and learned so to speak. Additionally, padding is added in order to maintain the spatial dimensions of the "images" and not lose out on the minute details from layer to layer.
+    \end{itemize}
+
+    \item Pooling Layers:
+    \begin{itemize}
+        \item MaxPool2d with 2x2 kernel and stride 2 after each convolutional layer
+        Pooling reduces spatial dimensions, providing some translation invariance and reducing computational load. The 2x2 pooling halves the spatial dimensions after each convolution, resulting in 4x4, then 2x2, and finally 1x1 feature maps.
+    \end{itemize}
+    
+    \item Flatten Layer
+    \begin{itemize}
+        \item Converts the 256 x 1 x 1 Tensor to a 256 dimension vector.
+    \end{itemize}
+    
+    \item Fully Connected Layers:
+    \begin{itemize}
+        \item FC1: $256 \rightarrow 512$ neurons
+        \item FC2: $512 \rightarrow 5$ neurons (output layer)
+        The first FC layer expands the representation to allow for more complex combinations of the learned features. The final layer reduces to 5 outputs, corresponding to the 5 possible values of the WDL metric. This part of the model is where the classification occurs.
+    \end{itemize}
+    
+    \item Activation Functions:
+    \begin{itemize}
+        \item ReLU after each convolutional and the first fully connected layer
+        ReLU introduces non-linearity without suffering from vanishing gradient problems \cite{krizhevskyAlexNet}, allowing for effective training of deep networks.
+    \end{itemize}
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = \textwidth]{images/CNNArchitectureLabelled.png}
+    \caption{Endgame CNN Model Architecture}
+    \label{fig: CNNArch}
+\end{figure}
+
+This architecture progressively reduces spatial dimensions while increasing the number of features, a common pattern in CNNs. The choice of layer sizes balances the need for feature extraction (through increasing channel counts) with the constraints of the input size. Starting with 64 channels and doubling to 128, then doubling again to 256, allows for a rich feature hierarchy without excessive computational demands given the small 8x8 input size. The use of powers of 2 for the layer sizes is also another common approach that makes use of the efficient computation of GPUs which usually have operations optimised on power of 2 sized arrays, while also keeping the process of memory access due to the used addressing schemes.
+
+The modern CNN architectures chosen as inspiration for the Endgame Model are mainly AlexNet \cite{krizhevskyAlexNet} and ResNet \cite{heResNet}, due to them being establishing significant breakthroughs in the context of image classification \cite{ImageNet}
+
+\subsection{Training}
+With the model architecture now in place, the next step is to train it to achieve the desired outcome. The training step can be simplified into the following:
+
+\begin{enumerate}
+    \item Create a dataset consisting of the features that are relevant to the prediction, and the expected output value for these respective features.
+    \item Split the dataset into training and testing data
+    \item Allow the model to iterate through the training data, and adjust its internal randomly initialised weights accordingly
+    \item Test the chosen weights using the testing data, and compare it to the actual expected output
+    \item Repeat from the second step until a satisfactory accuracy is reached
+\end{enumerate}
+
+\subsubsection{Dataset}
+To create the dataset needed for training one must first thing about how the functionality of the model would be used. In our case, we want to replace tablebases. Tablebases are provided with a position and are probed in order to output the specific metric we're after (in this case WDL). This would mean our dataset should consist of a representation of a chess position as the \textit{feature} and the WDL as the \textit{target}. In other words all we need are two list containing the features, and their respective targets.
+
+There are several options to acquiring chess endgame positions. Several collections of millions upon millions of games are publicly available online, some of them containing only games of the highest rated players \cite{liDB}\cite{liEliteDB}. These are valid ways of acquiring endgame position, the drawback to them would be that one would need to parse all the games so that only 6-man positions are considered.
+
+The method chosen in this paper was to write a script capable of generating all FENs of positions containing 6 pieces or fewer \cite{FEN}, with that the need for precomputing the games is removed, since the endgame position is directly created. Due to the nature of neural networks and how they \textit{learn} the data in order to find the ideal weights/kernel sizes for each layer, the larger that the dataset used is the higher the chances of improving the model's accuracy are, therefore the dataset used contains 1,000,000 endgame positions alongside their correct WDL evaluation.
+
+\subsubsection{Training Loop}
+The training loop is the core process where the model learns from the data. It involves repeatedly exposing the model to the training data, computing the loss, and adjusting the model's parameters to minimize this loss. It works as follows:
+
+\begin{enumerate}
+    \item Batch Processing: The training data is divided into batches. This allows for more efficient computation and helps in generalising the model by introducing some noise in the gradient computations.
+    \item Forward Pass: For each batch, the model performs a forward pass. The input data (12x8x8 Bitboard representation of FEN) is fed through the network, resulting in predictions for the desired outcome (WDL).
+    \item Loss Computation: The model's predictions are compared to the actual WDL values using a loss function. In this case, we use the cross-entropy loss function \cite{mao2023crossentropylossfunctionstheoretical}, which is particularly suitable for multi-class classification problems like our WDL prediction.
+    \item Backpropagation: The gradients of the loss with respect to the model's parameters are computed using backpropagation. This process calculates how much each parameter contributed to the error.
+    \item Parameter Update: The model's parameters are updated using an optimization algorithm (e.g., Stochastic Gradient Descent or Adam \cite{Goodfellow-et-al-2016}) to minimize the loss.
+    \item Iteration: Steps 2-5 are repeated for each batch in the training data, constituting one epoch. Multiple epochs are typically performed to refine the model's performance.
+    
+\end{enumerate}
+
+\paragraph{Cross-Entropy Loss Function}
+The cross-entropy loss function is used in this model due to its effectiveness in multi-class classification tasks. It measures the dissimilarity between the predicted probability distribution and the actual distribution of the WDL outcomes.
+For a single training example, the cross-entropy loss is defined as:
+\[
+L = -\sum_{i=1}^{C} y_i \log(\hat{y}_i)
+\]
+Where:
+\begin{itemize}
+\item $C$ is the number of classes (in our case, 3 for Win, Draw, Loss)
+\item $y_i$ is the true probability of class $i$ (either 0 or 1 in our one-hot encoded targets)
+\item $\hat{y}_i$ is the predicted probability of class $i$
+\end{itemize}
+The loss is minimized when the predicted probabilities closely match the true probabilities. In our case, since each position has only one correct WDL value, the true probability will be 1 for the correct class and 0 for the others.
+The use of cross-entropy loss encourages the model to be confident in its correct predictions while heavily penalizing confident incorrect predictions. This aligns well with our goal of accurately classifying chess endgame positions into Win, Draw, or Loss categories.
+During training, the model aims to minimize this loss function across all training examples, effectively learning to accurately predict the WDL values for given chess positions.
+
+\subsection{Results}
+Two versions of the model were trained, one using 10 Epochs (aka iterations of the training loop) and the other trained using 50. The relevant metrics throughout the epochs are the training and validation loss (calculated with the previously mentioned Cross Entropy Loss).
+
+The following Plots visualise how these change, alongside a Plot of the accuracy of each model.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.35]{images/10EpochTrainValLoss.png}
+    \includegraphics[scale=0.35]{images/10EpochValAcc.png}
+    \caption{Training and Validation Loss alongside Validation Accuracy for 10 Epochs}
+    \label{fig: 10epoch Metrics}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.35]{images/50EpochTrainValLoss.png}
+    \includegraphics[scale=0.35]{images/50EpochValAcc.png}
+    \caption{Training and Validation Loss alongside Validation Accuracy 50 Epochs}
+    \label{fig: 50epoch Metrics}
+\end{figure}
+
+We notice that after 10 epochs the model begins to have an increasing validation loss, this usually points towards the fact that the model is overfitting. This essentially means that instead of learning patterns, and generalising these findings accross the possible positions it could face, the model starts to memorise the specific inputs it gets. This in turn leads to a decrease in the accuracy of the predicted values.
+
+A possible reason for this happen, would be the "limited" sample space. The amount of patterns that the model could learn isn't that large when there are at most 6 figures on the board. This would lead to the model coming across similar or even identical patterns several times as it goes through the training dataset. This repeated exposure to the same pattern leads to the model simply memorising the output that is expected whenever it faces that said pattern.
+\newpage
+When it comes to practical use below is an example of the models being used to probe a position.
+
+\begin{lstlisting}[caption= Example comparing output of both models to Syzygy 6-man Tablebase]
+Input FEN: 8/K2p4/8/8/6P1/3P4/Q7/2k5 w - - 0 1
+. . . . . . . .
+K . . p . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . P .
+. . . P . . . .
+Q . . . . . . .
+. . k . . . . .
+Predicted WDL (50 Epoch Model): 2 (0.172 s)
+Predicted WDL (10 Epoch Model): 2 (0.016 s)
+Actual WDL: 2 (0.093 s)
+\end{lstlisting}
+
+On average the standard approach of probing the tablebase, and loading the 10 epoch model and prediciting the WDL for the input FEN have very close times. The main difference would be to the 50 Epoch model.
+
+Below is a practical comparision of the models with a 1000 randomly generated FEN strings.
+
+\begin{lstlisting}[caption=Practical comparision of accuracy between models]
+No. of tested FENs: 1000
+10 Epoch Accuracy: 0.921
+50 Epoch Accuracy: 0.910
+\end{lstlisting}
+
+This comparision only takes into consideration the time needed to load the weights of the trained models and using them to predict the WDL of the given position.
+
+The actual training time was left out due to it varying depending on the hardware on which it was trained. The hardware used in this case was the NVIDIA GeForce GTX 1650 GPU which is considered to be on the lower end of the today's GPU, but with the help of CUDA\cite{Cuda} it was possible to vectorise the process of training the model by using PyTorch Tensors\cite{PyTorchtensors}, allowing the complete utilisation of the GPU. With that in mind, the training of both models took an accumulative time of around 3 hours.
+
+Having the models predict the WDL in a somewhat compareable time frame to the tablebase probing it is a nice advantage but the main objective here was to significantly decrease the amount of storage space required.
+
+The storage would mostly be needed for the dataset used to train the models, and once that step is done, we'll need to store the weights of the trained models. With the help of the NumPy library, alongside using PyTorch to extract and store the weights in a convenient compatible way lead to them needing no more than 3-5GBs of storage all together.
+
+This is a substantial decrease in the storage needs compared to the nearly 70GBs of storage needed just for the WDL Tablebase. The drawback is that the prediction are no longer perfect, but with a more carefully tailored dataset, or cleverly optimised CNN Architecture the accuracy could be increased even more.
+
+\subsection{Shortcomings}
+Some readers may have noticed what could only seem like a logical fallacy whenever the dataset and its creation was mentioned. The tablebase was used to create the dataset for the model trained to replace said tablebase. In other words, we use the tablebase to replace the tablebase.
+
+As foolish as it may sound at first, this has its reason. The original aspect of this paper was to take a  zero knowledge base approach. This means that the neural network would learn to evaluate positions from randomly guessing WDL values at first, and with the help of a reward function that rewards the model when it guesses correctly and penalises it heavily when its wrong, to accurately returning the desired output value. In essence, it would be a process of trial and error.
+
+This approach is how Alpha-Zero\cite{AlphaZero} was capable of training itself towards chess mastery in less than a day.
+
+As it was mentioned in Klein's Chapter of implementing AlphaZero techniques in HexaPawnZero \cite{Klein}, programming a zero knowledge base neural networks requires colossal amounts of computing power that simply was not readily available in the volume necessary to make this possible, and could theoretically last many hours longer training.
+
+Assuming one could gain access to sufficient computing power, this would be an interesting continuation of this paper, perhaps on tablebases with 3-5 pieces as a start.

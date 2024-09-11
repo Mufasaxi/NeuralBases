@@ -6,7 +6,29 @@
 \usepackage{float}
 \usepackage{hyperref}
 \usepackage{amsmath}
+\usepackage{listings}
+\usepackage{color}
 
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Java,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
 \newgeometry{vmargin={30mm}, hmargin={30mm,30mm}}
 
 \title{Beyond Tablebases \\[0.5em]\smaller{} Utilising Neural Networks for Efficient Chess Endgame Resolution}
@@ -25,6 +47,7 @@
 \input{sections/2_ChessProgramming}
 \input{sections/3_Tablebases}
 \input{sections/4_NeuralNets}
+\input{sections/5_Conclusions}
 
 \newpage
 \bibliographystyle{plain}
