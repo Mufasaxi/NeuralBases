@@ -1,0 +1,151 @@
+(env) D:\musta\Github Projects\NeuralBases>python src/neuralnet/train.py
+Epoch 1/50:
+Train Loss: 0.3313
+Val Loss: 0.2777, Val Accuracy: 0.8836
+Epoch 2/50:
+Train Loss: 0.2687
+Val Loss: 0.2542, Val Accuracy: 0.8952
+Epoch 3/50:
+Train Loss: 0.2443
+Val Loss: 0.2378, Val Accuracy: 0.9047
+Epoch 4/50:
+Train Loss: 0.2278
+Val Loss: 0.2344, Val Accuracy: 0.9061
+Epoch 5/50:
+Train Loss: 0.2171
+Val Loss: 0.2256, Val Accuracy: 0.9094
+Epoch 6/50:
+Train Loss: 0.2081
+Val Loss: 0.2256, Val Accuracy: 0.9104
+Epoch 7/50:
+Train Loss: 0.2004
+Val Loss: 0.2236, Val Accuracy: 0.9111
+Epoch 8/50:
+Train Loss: 0.1937
+Val Loss: 0.2215, Val Accuracy: 0.9126
+Epoch 9/50:
+Train Loss: 0.1877
+Val Loss: 0.2202, Val Accuracy: 0.9140
+Epoch 10/50:
+Train Loss: 0.1821
+Val Loss: 0.2277, Val Accuracy: 0.9111
+Epoch 11/50:
+Train Loss: 0.1768
+Val Loss: 0.2360, Val Accuracy: 0.9093
+Epoch 12/50:
+Train Loss: 0.1720
+Val Loss: 0.2272, Val Accuracy: 0.9121
+Epoch 13/50:
+Train Loss: 0.1675
+Val Loss: 0.2389, Val Accuracy: 0.9109
+Epoch 14/50:
+Train Loss: 0.1630
+Val Loss: 0.2426, Val Accuracy: 0.9089
+Epoch 15/50:
+Train Loss: 0.1589
+Val Loss: 0.2430, Val Accuracy: 0.9094
+Epoch 16/50:
+Train Loss: 0.1545
+Val Loss: 0.2495, Val Accuracy: 0.9087
+Epoch 17/50:
+Train Loss: 0.1506
+Val Loss: 0.2581, Val Accuracy: 0.9069
+Epoch 18/50:
+Train Loss: 0.1466
+Val Loss: 0.2559, Val Accuracy: 0.9098
+Epoch 19/50:
+Train Loss: 0.1430
+Val Loss: 0.2727, Val Accuracy: 0.9060
+Epoch 20/50:
+Train Loss: 0.1399
+Val Loss: 0.2783, Val Accuracy: 0.9053
+Epoch 21/50:
+Train Loss: 0.1363
+Val Loss: 0.2823, Val Accuracy: 0.9048
+Epoch 22/50:
+Train Loss: 0.1341
+Val Loss: 0.2974, Val Accuracy: 0.9074
+Epoch 23/50:
+Train Loss: 0.1312
+Val Loss: 0.3007, Val Accuracy: 0.9061
+Epoch 24/50:
+Train Loss: 0.1281
+Val Loss: 0.3003, Val Accuracy: 0.9080
+Epoch 25/50:
+Train Loss: 0.1263
+Val Loss: 0.2830, Val Accuracy: 0.9051
+Epoch 26/50:
+Train Loss: 0.1222
+Val Loss: 0.3097, Val Accuracy: 0.9065
+Epoch 27/50:
+Train Loss: 0.1207
+Val Loss: 0.3053, Val Accuracy: 0.9054
+Epoch 28/50:
+Train Loss: 0.1181
+Val Loss: 0.3138, Val Accuracy: 0.9048
+Epoch 29/50:
+Train Loss: 0.1160
+Val Loss: 0.3448, Val Accuracy: 0.9043
+Epoch 30/50:
+Train Loss: 0.1154
+Val Loss: 0.3106, Val Accuracy: 0.9044
+Epoch 31/50:
+Train Loss: 0.1118
+Val Loss: 0.3259, Val Accuracy: 0.9041
+Epoch 32/50:
+Train Loss: 0.1098
+Val Loss: 0.3580, Val Accuracy: 0.9042
+Epoch 33/50:
+Train Loss: 0.1078
+Val Loss: 0.3693, Val Accuracy: 0.9005
+Epoch 34/50:
+Train Loss: 0.1054
+Val Loss: 0.3740, Val Accuracy: 0.9026
+Epoch 35/50:
+Train Loss: 0.1057
+Val Loss: 0.3690, Val Accuracy: 0.9012
+Epoch 36/50:
+Train Loss: 0.1030
+Val Loss: 0.3816, Val Accuracy: 0.9019
+Epoch 37/50:
+Train Loss: 0.1024
+Val Loss: 0.3784, Val Accuracy: 0.9025
+Epoch 38/50:
+Train Loss: 0.1001
+Val Loss: 0.4025, Val Accuracy: 0.9033
+Epoch 39/50:
+Train Loss: 0.0992
+Val Loss: 0.4044, Val Accuracy: 0.9030
+Epoch 40/50:
+Train Loss: 0.0974
+Val Loss: 0.4032, Val Accuracy: 0.9023
+Epoch 41/50:
+Train Loss: 0.0962
+Val Loss: 0.4255, Val Accuracy: 0.9036
+Epoch 42/50:
+Train Loss: 0.0951
+Val Loss: 0.4058, Val Accuracy: 0.9032
+Epoch 43/50:
+Train Loss: 0.0939
+Val Loss: 0.4679, Val Accuracy: 0.9008
+Epoch 44/50:
+Train Loss: 0.0929
+Val Loss: 0.4388, Val Accuracy: 0.9024
+Epoch 45/50:
+Train Loss: 0.0926
+Val Loss: 0.4277, Val Accuracy: 0.8995
+Epoch 46/50:
+Train Loss: 0.0901
+Val Loss: 0.4543, Val Accuracy: 0.9009
+Epoch 47/50:
+Train Loss: 0.0892
+Val Loss: 0.4912, Val Accuracy: 0.8997
+Epoch 48/50:
+Train Loss: 0.0881
+Val Loss: 0.4678, Val Accuracy: 0.9011
+Epoch 49/50:
+Train Loss: 0.0892
+Val Loss: 0.4887, Val Accuracy: 0.8975
+Epoch 50/50:
+Train Loss: 0.0875
+Val Loss: 0.5186, Val Accuracy: 0.9004

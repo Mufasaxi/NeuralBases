@@ -1,0 +1,31 @@
+(env) D: \musta\Github Projects\NeuralBases>python src/neuralnet/train.py
+Epoch 1/10:
+Train Loss: 0.3295
+Val Loss: 0.2765, Val Accuracy: 0.8840
+Epoch 2/10:
+Train Loss: 0.2671
+Val Loss: 0.2558, Val Accuracy: 0.8962
+Epoch 3/10:
+Train Loss: 0.2429
+Val Loss: 0.2394, Val Accuracy: 0.9033
+Epoch 4/10:
+Train Loss: 0.2276
+Val Loss: 0.2338, Val Accuracy: 0.9064
+Epoch 5/10:
+Train Loss: 0.2158
+Val Loss: 0.2321, Val Accuracy: 0.9068
+Epoch 6/10:
+Train Loss: 0.2071
+Val Loss: 0.2258, Val Accuracy: 0.9097
+Epoch 7/10:
+Train Loss: 0.1991
+Val Loss: 0.2264, Val Accuracy: 0.9105
+Epoch 8/10:
+Train Loss: 0.1923
+Val Loss: 0.2267, Val Accuracy: 0.9098
+Epoch 9/10:
+Train Loss: 0.1862
+Val Loss: 0.2350, Val Accuracy: 0.9089
+Epoch 10/10:
+Train Loss: 0.1808
+Val Loss: 0.2352, Val Accuracy: 0.9096
