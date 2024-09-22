@@ -1,7 +1,7 @@
 \section{Neural Networks in Chess}
 \label{sec:NeuralNets}
 
-Over the last decade computer engines went from consisting of intelligent efficient search and evaluation algorithms, to being focused on creating larger, and intricate neural network architectures that could reach newer heights when it comes to accuracy and general strength of play. Examples of this include the previously mentioned Stockfish \cite{stockfish2024} and AlphaZero \textbf{REF TO ALPHA ZERO}. The prior being an amalgamation of using algorithms like MinMax \& Alpha-Beta Pruning \ref{sec:Chess Programming} to guide the neural network in finding the most optimal move, while the latter being made up of a neural network that teaches itself the game of chess without prior outside knowledge, using techniques like Monte Carlo Tree Search \textbf{REF TO MCTS}. Both approaches present the different paradigms of creating a strong chess engine, which in turn raises the question "How can one make use of these neural networks to improve how Endgames are played by engines?"
+Over the last decade computer engines went from consisting of intelligent efficient search and evaluation algorithms, to being focused on creating larger, and intricate neural network architectures that could reach newer heights when it comes to accuracy and general strength of play. Examples of this include the previously mentioned Stockfish \cite{stockfish2024} and AlphaZero \cite{AlphaZero}. The prior being an amalgamation of using algorithms like MinMax \& Alpha-Beta Pruning (see Section \ref{sec:Chess Programming}) to guide the neural network in finding the most optimal move, while the latter being made up of a neural network that teaches itself the game of chess without prior outside knowledge, using techniques like Monte Carlo Tree Search \cite{Klein}. Both approaches present the different paradigms of creating a strong chess engine, which in turn raises the question "How can one make use of these neural networks to improve how Endgames are played by engines?"
 
 \subsection{Overview}
 The main objective of this paper, as highlighted by its title, is to explore how neural networks can be used as a replacement to endgame tablebases in the hope of finding benefits when it comes to the speed of probing, but more importantly to save on the storage space required by the tablebases. For the sake of simplicity and lack of resources, this paper will look into one metric provided by tablebases, and using a neural network in place of the tablebase for probing.
@@ -10,9 +10,9 @@ More concretely, the objective is to design a neural network that given a chess 
 
 \subsection{Pattern Recognition}
 \label{subsec:PattRec}
-Similar to the approach of considering how a Grandmaster would think about the problem of finding the best move in Section \ref{sec:Chess Programming} in order to come up with efficient algorithms for finding the best move, using this approach here when given a position and determining the WDL, more abstractly determining whether it is good or bad, can help pinpoint what features make up a position.
+Similar to the process of examining how a Grandmaster would think about the problem of finding the best move in Section \ref{sec:Chess Programming}, using this approach here when given a position and determining the WDL, more abstractly determining whether it is good or bad, can help pinpoint what features make up a position.
 
-In the experiments conducted by de Groot \cite{deGroot} players of varying strength ranging from masters to complete novices were presented with various positions that could arise in a standard game of chess and were given the task of reproducing the position on an empty board after viewing it for a short period of time (3-10 seconds). On average, it was found that master level players were able to more accurately reproduce the position with only a couple of pieces being misplaced if at all, while novice players showcased having a larger margin of error when recreating the given positions.
+In the experiments conducted by de Groot \cite{deGroot} players of varying strength ranging from masters to complete novices were presented with various positions that could arise in a standard game of chess and were given the task of reproducing the position on an empty board after viewing it for a short period of time (3-10 seconds). On average, it was found that master level players were able to more accurately reproduce the position with only a couple of pieces being misplaced, if at all, while novice players showcased having a larger margin of error when recreating the given positions.
 
 On first glance, one could hypothesise that since a master player has spent a long period of time in contact with chess positions that their memory for remembering such positions would be better compared to that of a novice player. Nevertheless, this would be disproven when considering the second set of experiments conducted.
 
@@ -44,14 +44,28 @@ Figures \ref{MorphyPosition} \& \ref{RandomPosition} show visually what a positi
 The process just described is exactly what needs to be done by the neural networks, in order to extract the essential features like pawn structures, relative positions of the pieces to each other, and many more so that it can make an accurate estimation about whether a position is good or not. In simpler words, we need a neural network good at recognising patterns.
 
 \subsection{Convolutional Neural Networks}
-Convolutional Neural Network are a special type of neural network architecture used mainly in the field of image/object recognition. When dealing with a grey-scale image like the ones in the MNIST Classification Dataset \cite{MNIST} one could use the traditional Multi-Layer-Perceptron \textbf{REF TO MLP} where each pixel would have a value ranging from 0 (black) to 255 (white), and the 2x2 grid of pixel would then be converted to a singular 1-dimensional array that is treated as the input of the perceptron, and fully connected to the following hidden layers with the respective weights, biases and activation functions, eventually leading to the output layer containing 10 neurons/nodes each corresponding to a digit 0-9 with the value outputted at each node being the confidence/probability of the given image being the corresponding number represented by the node. \textbf{INSERT FIGURE TO SHOW PROCESS OF MODELLING AS 1D ARRAY AND NEURAL NET}
+Convolutional Neural Network are a special type of neural network architecture used mainly in the field of image/object recognition. When dealing with a grey-scale image like the ones in the MNIST Classification Dataset \cite{MNIST} one could use the traditional Multi-Layer-Perceptron \cite{Klein} where each pixel would have a value ranging from 0 (black) to 255 (white), and the 2x2 grid of pixel would then be converted to a singular 1-dimensional array that is treated as the input of the perceptron, and fully connected to the following hidden layers with the respective weights, biases and activation functions, eventually leading to the output layer containing 10 neurons/nodes each corresponding to a digit 0-9 with the value outputted at each node being the confidence/probability of the given image being the corresponding number represented by the node.
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.45]{images/2Dto1D.png}
+    \caption{Modelling a 2D Grid of Pixels (commonly known as an image) in one dimension}
+    \label{2Dto1D}
+\end{figure}
 
-With sufficient training data, such a model could be very accurate and reliable in several use cases, but one major problem arises, scaling. The MNIST Handwritten Digits Dataset contains images of dimension 28x28, in other words there are 784 individual pixlels that must each correspond to a single neuron. Furthermore, most images processed in the context of image/object recognition are much larger than the measly 28x28 dimensions of the MNIST Dataset, so in the worst case, one would need to adjust the size of the input layer for each type of image to be processed. This alone increases the complexity of the architecture when using greyscale images, let alone coloured ones.
 
-This is where CNNs shine, their architecture allows for variability in the size of the input images without significantly increasing the size or complexity of the model. The process involves the input going through multiple convolutional layers that contain kernels/filters that pass over the image as a whole and create an output matrix known as a feature map. The size of each convolutional layer depends on the size of the convolutional layer preceeding it and its resepctive kernels. The size of the kernels determines what is known as the receptive field. This tells us how much information from the previous layers is propagated through to the current layer \cite{lecun2015deep}. \textbf{ADD FIGURES TO DEMONSTRATE CONVOLUTION AND KERNELS}.
+With sufficient training data, such a model could be very accurate and reliable in several use cases, but one major problem arises. Scaling. The MNIST Handwritten Digits Dataset contains images of dimension 28x28, in other words there are 784 individual pixels that must each correspond to a single neuron. Furthermore, most images processed in the context of image/object recognition are much larger than the measly 28x28 dimensions of the MNIST Dataset, so in the worst case, one would need to adjust the size of the input layer for each type of image to be processed. This alone increases the complexity of the architecture when using greyscale images, let alone coloured ones.
+
+This is where CNNs shine, their architecture allows for variability in the size of the input images without significantly increasing the size or complexity of the model. The process involves the input going through multiple convolutional layers that contain kernels/filters that pass over the image as a whole and create an output matrix known as a feature map. The size of each convolutional layer depends on the size of the convolutional layer preceeding it and its resepctive kernels. The size of the kernels determines what is known as the receptive field. This tells us how much information from the previous layers is propagated through to the current layer \cite{lecun2015deep}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/LeNet5Arch.png}
+    \caption{Example architecture of LeNet5 \cite{LeNet5} where the kernels and convolutional layers are seen}
+    \label{LeNet}
+\end{figure}
 
 \subsubsection{Convolution \& Kernels}
-Convolution is the fundamental operation that gives CNNs their name and is key to their ability to efficiently process images, or more generally spatial data. In the context of CNNs, convolution is a mathematical operator that involves the input data (such as an image) and the kernel.
+Convolution \cite{Goodfellow-et-al-2016} is the fundamental operation that gives CNNs their name and is key to their ability to efficiently process images, or more generally spatial data. In the context of CNNs, convolution is a mathematical operator that involves the input data (such as an image) and the kernel.
 The convolution operation slides the kernel over the input data, performing element-wise multiplication at each position and summing the results to produce a single output value. This process is repeated across the entire input, creating a feature map that highlights particular features or patterns in the data.
 For a 2D input image I and a kernel K, the convolution operation can be expressed as follows:
 \[
@@ -60,7 +74,8 @@ For a 2D input image I and a kernel K, the convolution operation can be expresse
 Where $(i,j)$ represents the position in the output feature map, and $(m,n)$ are the coordinates within the kernel.
 Let's consider a simple example to illustrate this process:
 Suppose we have a 5x5 input image and a 3x3 kernel:
-Input Image:
+
+\noindent Input Image:
 \[
 \begin{bmatrix}
 1 & 1 & 1 & 0 & 0 \\
@@ -98,7 +113,7 @@ The kernels used within the first several layers are basic like the one used in 
 \subsubsection{Pooling layers \& Padding}
 From the example above, one could notice that the convolution of the 5x5 input matrix using a 3x3 kernel, resulted in a feature map output matrix of dimension 3x3. In other words, the essence of the original input matrix (\textit{i.e. image}) was extracted into a smaller matrix. Depending on the situation this extraction into smaller matrices containing the bare minimum when it comes to essential features can be taken further by introducing the concept of pooling \cite{lecun2015deep}.
 
-Briefly, pooling combines features that are similar, in other words in close proximity to one another, and spits out a number that is representative of them. There are 2 types of pooling layers that are commonly used across most CNNS.
+Briefly, pooling combines features that are similar, in other words in close proximity to one another, and spits out a number that is representative of them. There are 2 types of pooling layers that are commonly used across most CNNs.
 
 \begin{itemize}
     \item Average Pooling Layers
@@ -117,7 +132,8 @@ Suppose we have a 4x4 input matrix (which could be the output of a previous conv
 \end{bmatrix}
 \]
 We'll apply both max pooling and average pooling with a 2x2 filter and a stride of 2.
-\textbf{Max Pooling:}
+
+\noindent\textbf{Max Pooling:}
 For max pooling, we take the maximum value in each 2x2 region:
 \[
 \begin{bmatrix}
@@ -217,7 +233,10 @@ To represent an entire chess position one would need \textit{at least} 16 bitboa
 With that we get a decomposition of what could be a complex chess position into its bare constituents separated over their respective channels, and from that the CNN would be able to come up with its own abstract filter/kernels to make sense and create relations out of the pieces and their positions in order to be able to come up with a concrete value of whether the given position is winning, drawn, or losing for the side to move.
 
 \subsection{Architecture}
-The CNN architecture chosen is designed to process 12-channel 8x8 input "images". The network consists of three convolutional layers followed by two fully connected layers. The individual layers of the model are visualised in Figure \ref{fig: CNNArch} and are explained below \footnote{It may seem that some kernels are larger than their respecive layers, but this is due to the omission of padding in the visualisation}:
+\label{Arch}
+The CNN architecture chosen is designed to process 12-channel 8x8 input "images". The network consists of three convolutional layers followed by two fully connected layers. The individual layers of the model are visualised in Figure \ref{fig: CNNArch} and are explained below \footnote{It may seem that some kernels are larger than their respective layers, but this is due to the omission of padding in the visualisation}:
+
+\newpage
 
 \begin{itemize}
     \item Input Layer:
@@ -225,9 +244,6 @@ The CNN architecture chosen is designed to process 12-channel 8x8 input "images"
         \item Dimensions: 12 x 8 x 8
         \item The 12 channels each represent the position of a unique type of chess piece on the 8x8 chessboard.
     \end{itemize}
-
-    \newpage
-    
     \item Convolutional Layers:
     \begin{itemize}
         \item Conv1: $12 \rightarrow 64$ channels, 3x3 kernel, padding=1
@@ -240,6 +256,7 @@ The CNN architecture chosen is designed to process 12-channel 8x8 input "images"
     \item Pooling Layers:
     \begin{itemize}
         \item MaxPool2d with 2x2 kernel and stride 2 after each convolutional layer
+        
         Pooling reduces spatial dimensions, providing some translation invariance and reducing computational load. The 2x2 pooling halves the spatial dimensions after each convolution, resulting in 4x4, then 2x2, and finally 1x1 feature maps.
     \end{itemize}
     
@@ -252,12 +269,14 @@ The CNN architecture chosen is designed to process 12-channel 8x8 input "images"
     \begin{itemize}
         \item FC1: $256 \rightarrow 512$ neurons
         \item FC2: $512 \rightarrow 5$ neurons (output layer)
+        
         The first FC layer expands the representation to allow for more complex combinations of the learned features. The final layer reduces to 5 outputs, corresponding to the 5 possible values of the WDL metric. This part of the model is where the classification occurs.
     \end{itemize}
     
     \item Activation Functions:
     \begin{itemize}
         \item ReLU after each convolutional and the first fully connected layer
+        
         ReLU introduces non-linearity without suffering from vanishing gradient problems \cite{krizhevskyAlexNet}, allowing for effective training of deep networks.
     \end{itemize}
 \end{itemize}
@@ -271,7 +290,7 @@ The CNN architecture chosen is designed to process 12-channel 8x8 input "images"
 
 This architecture progressively reduces spatial dimensions while increasing the number of features, a common pattern in CNNs. The choice of layer sizes balances the need for feature extraction (through increasing channel counts) with the constraints of the input size. Starting with 64 channels and doubling to 128, then doubling again to 256, allows for a rich feature hierarchy without excessive computational demands given the small 8x8 input size. The use of powers of 2 for the layer sizes is also another common approach that makes use of the efficient computation of GPUs which usually have operations optimised on power of 2 sized arrays, while also keeping the process of memory access due to the used addressing schemes.
 
-The modern CNN architectures chosen as inspiration for the Endgame Model are mainly AlexNet \cite{krizhevskyAlexNet} and ResNet \cite{heResNet}, due to them being establishing significant breakthroughs in the context of image classification \cite{ImageNet}
+The modern CNN architectures chosen as inspiration for the Endgame Model are mainly AlexNet \cite{krizhevskyAlexNet} and ResNet \cite{heResNet}, due to them establishing significant breakthroughs in the context of image classification \cite{ImageNet}
 
 \subsection{Training}
 With the model architecture now in place, the next step is to train it to achieve the desired outcome. The training step can be simplified into the following:
@@ -292,7 +311,7 @@ There are several options to acquiring chess endgame positions. Several collecti
 The method chosen in this paper was to write a script capable of generating all FENs of positions containing 6 pieces or fewer \cite{FEN}, with that the need for precomputing the games is removed, since the endgame position is directly created. Due to the nature of neural networks and how they \textit{learn} the data in order to find the ideal weights/kernel sizes for each layer, the larger that the dataset used is the higher the chances of improving the model's accuracy are, therefore the dataset used contains 1,000,000 endgame positions alongside their correct WDL evaluation.
 
 \subsubsection{Training Loop}
-The training loop is the core process where the model learns from the data. It involves repeatedly exposing the model to the training data, computing the loss, and adjusting the model's parameters to minimize this loss. It works as follows:
+The training loop is the core process where the model learns from the data \cite{TrainingPyTorch}. It involves repeatedly exposing the model to the training data, computing the loss, and adjusting the model's parameters to minimize this loss. It works as follows:
 
 \begin{enumerate}
     \item Batch Processing: The training data is divided into batches. This allows for more efficient computation and helps in generalising the model by introducing some noise in the gradient computations.
@@ -305,7 +324,7 @@ The training loop is the core process where the model learns from the data. It i
 \end{enumerate}
 
 \paragraph{Cross-Entropy Loss Function}
-The cross-entropy loss function is used in this model due to its effectiveness in multi-class classification tasks. It measures the dissimilarity between the predicted probability distribution and the actual distribution of the WDL outcomes.
+The cross-entropy loss function \cite{crossentropyloss} is used in this model due to its effectiveness in multi-class classification tasks. It measures the dissimilarity between the predicted probability distribution and the actual distribution of the WDL outcomes.
 For a single training example, the cross-entropy loss is defined as:
 \[
 L = -\sum_{i=1}^{C} y_i \log(\hat{y}_i)
@@ -321,7 +340,7 @@ The use of cross-entropy loss encourages the model to be confident in its correc
 During training, the model aims to minimize this loss function across all training examples, effectively learning to accurately predict the WDL values for given chess positions.
 
 \subsection{Results}
-Two versions of the model were trained, one using 10 Epochs (aka iterations of the training loop) and the other trained using 50. The relevant metrics throughout the epochs are the training and validation loss (calculated with the previously mentioned Cross Entropy Loss).
+Two versions of the model were trained, one using 10 Epochs (a.k.a. iterations of the training loop) and the other trained using 50. The relevant metrics throughout the epochs are the training and validation loss (calculated with the previously mentioned Cross Entropy Loss).
 
 The following Plots visualise how these change, alongside a Plot of the accuracy of each model.
 
@@ -343,7 +362,7 @@ The following Plots visualise how these change, alongside a Plot of the accuracy
 
 We notice that after 10 epochs the model begins to have an increasing validation loss, this usually points towards the fact that the model is overfitting. This essentially means that instead of learning patterns, and generalising these findings accross the possible positions it could face, the model starts to memorise the specific inputs it gets. This in turn leads to a decrease in the accuracy of the predicted values.
 
-A possible reason for this happen, would be the "limited" sample space. The amount of patterns that the model could learn isn't that large when there are at most 6 figures on the board. This would lead to the model coming across similar or even identical patterns several times as it goes through the training dataset. This repeated exposure to the same pattern leads to the model simply memorising the output that is expected whenever it faces that said pattern.
+A possible reason for this happening, would be the "limited" sample space. The amount of patterns that the model could learn isn't that large when there are at most 6 figures on the board. This would lead to the model coming across similar or even identical patterns several times as it goes through the training dataset. This repeated exposure to the same pattern leads to the model simply memorising the output that is expected whenever it faces that said pattern.
 \newpage
 When it comes to practical use below is an example of the models being used to probe a position.
 
@@ -362,9 +381,9 @@ Predicted WDL (10 Epoch Model): 2 (0.016 s)
 Actual WDL: 2 (0.093 s)
 \end{lstlisting}
 
-On average the standard approach of probing the tablebase, and loading the 10 epoch model and prediciting the WDL for the input FEN have very close times. The main difference would be to the 50 Epoch model.
+On average the standard approach of probing the tablebase, and loading the 10 epoch model and predicting the WDL for the input FEN have very close times. The main difference would be to the 50 Epoch model.
 
-Below is a practical comparision of the models with a 1000 randomly generated FEN strings.
+Below is a practical comparison of the models with 1000 randomly generated FEN strings.
 
 \begin{lstlisting}[caption=Practical comparision of accuracy between models]
 No. of tested FENs: 1000
@@ -372,23 +391,32 @@ No. of tested FENs: 1000
 50 Epoch Accuracy: 0.910
 \end{lstlisting}
 
-This comparision only takes into consideration the time needed to load the weights of the trained models and using them to predict the WDL of the given position.
+This comparison only takes into consideration the time needed to load the weights of the trained models and using them to predict the WDL of the given position.
 
-The actual training time was left out due to it varying depending on the hardware on which it was trained. The hardware used in this case was the NVIDIA GeForce GTX 1650 GPU which is considered to be on the lower end of the today's GPU, but with the help of CUDA\cite{Cuda} it was possible to vectorise the process of training the model by using PyTorch Tensors\cite{PyTorchtensors}, allowing the complete utilisation of the GPU. With that in mind, the training of both models took an accumulative time of around 3 hours.
+The actual training time was left out in this section due to it varying depending on the hardware on which it was trained. The hardware used in this case was the NVIDIA GeForce GTX 1650 GPU which is considered to be on the lower end of the today's GPU, but with the help of CUDA \cite{Cuda} it was possible to vectorise the process of training the model by using PyTorch Tensors \cite{PyTorchtensors}, allowing the complete utilisation of the GPU. With that in mind, the training of both models took an accumulative time of around 3 hours.
 
-Having the models predict the WDL in a somewhat compareable time frame to the tablebase probing it is a nice advantage but the main objective here was to significantly decrease the amount of storage space required.
+Having the models predict the WDL in a somewhat comparable time frame to the tablebase probing it is a nice advantage but the main objective here was to significantly decrease the amount of storage space required.
 
 The storage would mostly be needed for the dataset used to train the models, and once that step is done, we'll need to store the weights of the trained models. With the help of the NumPy library, alongside using PyTorch to extract and store the weights in a convenient compatible way lead to them needing no more than 3-5GBs of storage all together.
 
 This is a substantial decrease in the storage needs compared to the nearly 70GBs of storage needed just for the WDL Tablebase. The drawback is that the prediction are no longer perfect, but with a more carefully tailored dataset, or cleverly optimised CNN Architecture the accuracy could be increased even more.
 
 \subsection{Shortcomings}
-Some readers may have noticed what could only seem like a logical fallacy whenever the dataset and its creation was mentioned. The tablebase was used to create the dataset for the model trained to replace said tablebase. In other words, we use the tablebase to replace the tablebase.
+Some readers may have noticed what could only seem like a logical fallacy when the dataset and its creation were first mentioned. The tablebase was used to create the dataset for the model trained to replace said tablebase. In other words, we use the tablebase to replace the tablebase.
 
-As foolish as it may sound at first, this has its reason. The original aspect of this paper was to take a  zero knowledge base approach. This means that the neural network would learn to evaluate positions from randomly guessing WDL values at first, and with the help of a reward function that rewards the model when it guesses correctly and penalises it heavily when its wrong, to accurately returning the desired output value. In essence, it would be a process of trial and error.
+As foolish as it may sound at first, this has its reason. The original aspect of this paper was to take a zero-knowledge base approach. This means that the neural network would learn to evaluate positions from randomly guessing WDL values at first, and with the help of a function that rewards the model when it guesses correctly and penalises it heavily when its wrong, to accurately returning the desired output value. In essence, it would be a process of trial and error.
 
-This approach is how Alpha-Zero\cite{AlphaZero} was capable of training itself towards chess mastery in less than a day.
+This approach is how Alpha-Zero \cite{AlphaZero} was capable of training itself towards chess mastery in less than a day.
 
-As it was mentioned in Klein's Chapter of implementing AlphaZero techniques in HexaPawnZero \cite{Klein}, programming a zero knowledge base neural networks requires colossal amounts of computing power that simply was not readily available in the volume necessary to make this possible, and could theoretically last many hours longer training.
+As it was mentioned in Klein's Chapter of implementing AlphaZero techniques in HexaPawnZero \cite{Klein}, programming a zero-knowledge base neural networks requires colossal amounts of computing power that simply were not readily available in the volume necessary to make this possible, and could theoretically last many hours longer training.
 
 Assuming one could gain access to sufficient computing power, this would be an interesting continuation of this paper, perhaps on tablebases with 3-5 pieces as a start.
+
+Another major point of improvement would be the design of the CNN architecture. The architecture proposed in Section \ref{Arch} was settled upon by a series of trial and error experiments comparing the different outcomes, while also using the pointers mentioned in Stanford's CS231n course as a guide \cite{cs231n}. I was attempting to find a good balance between the resulting models and their accuracies, alongside ensuring that the training time does not take excessively long.
+
+The training time could also be a limiting factor if not dealt with properly. There were several points throughout the process that took several hours to deal with. For instance, downloading the tablebase metrics was no easy task, but even after writing my own script \cite{NeuralBases} to download them, it took a little over an hour to have all the necessary files available locally. When it comes to training the models, the 10 Epoch model took on average 40 minutes to complete its training, while the 50 Epoch model took around 90 minutes.
+
+The different versions of the concrete implementations, could be found in my code repository titled \textit{"NeuralBases"} \cite{NeuralBases}. It showcases how the end goal was incrementally refined. Initially, the idea was to create a chess playing neural network and compare it to the use of the tablebase in assisting a minimal implementation of a MinMax Chess engine. Upon closer inspection, this idea was scrapped due to it not being a fair comparison.
+
+The objective of a tablebase is to provide metrics about the given positions. Therefore, the original idea would be limited by how good my own implementation of the chess engine is, and would give an inaccurate representation of the true capabilities of tablebases. At the end, I settled on comparing the ability of neural networks to come up with the same metrics (in this case only the WDL) as those of the tablebase.
+
