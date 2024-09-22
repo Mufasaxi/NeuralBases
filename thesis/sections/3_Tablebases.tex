@@ -11,12 +11,17 @@ Tablebases are large databases containing all possible (and legal) chess positio
 
 Retrograde analysis works by taking a terminated position where one side is mated, and going backwards to discover all the possible positions that eventually lead up to the root position. This process is repeated for all mate positions for a given number of pieces, and subsequently a subdatabase of all possible positions that terminate in a mate are generated. Any other position that is still legal and valid but not found in the subdatabase is then marked as a draw.
 
-\textbf{VISUALLY EXPLAIN RETROGRADE}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.45]{images/retrogradeAnalysis.png}
+    \caption{Simple visualisation of Retrograde Analysis}
+    \label{rtroAnalysis}
+\end{figure}
 
 \subsubsection{Metrics}
 Whether a move leads to a checkmate or not is ultimately the main measure of how good a move is, but there are several other aspects one could consider on the way to a move that leads to checkmate. For instance, when no mate can be found, a move that leads to resetting the 50 Move Counter \cite{50Draw} could point in the direction of eventually finding a mating move.
 
-\newpage
+
 
 Few of the metrics that are commonly stored within tablebases are explained below:
 
@@ -34,15 +39,11 @@ Few of the metrics that are commonly stored within tablebases are explained belo
     \item \textbf{DTZ50}: The \textbf{D}epth \textbf{T}o \textbf{Z}eroing in the context of the \textbf{50} move rule metric is an extension of the DTZ metric with keeping in mind that the capture or the pawn move must occur within 50 moves so that a draw is avoided.
 \end{itemize}
 
-Depending on the simplicity of the program being developed and the performance sought after, one need not use all the metrics available, and it would suffice to only use one. This is of importance due to the large accumulative size of the files for each metric. In the case of the 6-man Syzygy Tablebases used in the Development of the programs accompanying this paper, the WDL files alone measure to around 70GBs and they are sufficient to providing a solid base of probing the tablebase to aid in finding the best move in a position. This would save around 80GBs of additional storage space that would've been needed for the DTZ files.
+Depending on the simplicity of the program being developed and the performance sought after, one need not use all the metrics available, and it would suffice to only use one. This is of importance due to the large accumulative size of the files for each metric. In the case of the 6-man Syzygy Tablebases used in the development of the programs accompanying this paper \cite{NeuralBases}, the WDL files alone measure to around 70GBs and they are sufficient to providing a solid base of probing the tablebase to aid in finding the best move in a position. This would save around 80GBs of additional storage space that would've been needed for the DTZ files.
 
 \subsection{Probing}
 Each position is assigned to an index that points to where the metrics such as WDL, DTZ, and others are stored for that specific position. In order to retrieve this information one would need to \textit{probe} the tablebase files.
 
-Probing consists of applying the chosen indexing algorithm of a tablebase on the given position. Once the unique index is calculated, it is used to locate where the metrics of that position are stored in order to extract them.\cite{chesswikiEGTB}
+Probing consists of applying the chosen indexing algorithm of a tablebase on the given position. Once the unique index is calculated, it is used to locate where the metrics of that position are stored in order to extract them \cite{chesswikiEGTB}.
 
-Since the objective of this paper focuses on alternatives for tablebases the implementation of this part, was left out and the publicly available library Python-Chess\cite{pychess} was used in dealing with the Syzygy 6-man WDL Tablebases.. This library was chosen due to its developer being involved with most of the Syzygy Tablebases related aspects of the chess website Lichess and created the web API for using Syzygy Tablebases\cite{lichess}\cite{syzygyAPI}. 
-
-
-
-\textbf{EITHER INSERT METRICS HERE OR AFTER NN PART}
+Since the objective of this paper focuses on alternatives for tablebases the implementation of this part, was left out and the publicly available library Python-Chess \cite{pychess} was used in dealing with the Syzygy 6-man WDL Tablebases.. This library was chosen due to its developer being involved with most of the Syzygy Tablebases related aspects of the chess website Lichess and created the web API for using Syzygy Tablebases \cite{lichess}\cite{syzygyAPI}.
