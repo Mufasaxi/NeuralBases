@@ -78,11 +78,11 @@ Suppose we have a 5x5 input image and a 3x3 kernel:
 \noindent Input Image:
 \[
 \begin{bmatrix}
-1 & 1 & 1 & 0 & 0 \\
+1 & 0 & 1 & 1 & 1 \\
+0 & 1 & 0 & 1 & 0 \\
+1 & 1 & 1 & 0 & 1 \\
 0 & 1 & 1 & 1 & 0 \\
-0 & 0 & 1 & 1 & 1 \\
-0 & 0 & 1 & 1 & 0 \\
-0 & 1 & 1 & 0 & 0 \\
+1 & 1 & 1 & 1 & 0 \\
 \end{bmatrix}
 \]
 Kernel:
@@ -95,14 +95,14 @@ Kernel:
 \]
 To compute the first element of the output feature map, we would perform the following calculation:
 \[
-(1 \cdot 1) + (1 \cdot 0) + (1 \cdot 1) + (0 \cdot 0) + (1 \cdot 1) + (1 \cdot 0) + (0 \cdot 1) + (0 \cdot 0) + (0 \cdot 1) = 4
+(1 \cdot 1) + (0 \cdot 0) + (1 \cdot 1) + (0 \cdot 0) + (1 \cdot 1) + (0 \cdot 0) + (1 \cdot 1) + (1 \cdot 0) + (1 \cdot 1) = 5
 \]
 The kernel then slides over by one position (the stride), and the process is repeated. The final output feature map for this example would be:
 \[
 \begin{bmatrix}
-4 & 3 & 4 \\
-2 & 4 & 3 \\
-2 & 3 & 4\\
+5 & 2 & 5 \\
+2 & 5 & 1 \\
+5 & 4 & 4\\
 \end{bmatrix}
 \]
 This example demonstrates how convolution can detect patterns or features. In this case, the kernel is sensitive to diagonal patterns in the input image.
@@ -157,8 +157,8 @@ For average pooling, we take the average value in each 2x2 region:
 2.75 & 2 \\
 \end{bmatrix}
 \]
-Both pooling operations reduce the spatial dimensions of the input. Max pooling tends to highlight the strongest features, while average pooling provides a smoother representation of the features.
-Padding is another important concept in CNNs. It involves adding extra rows and columns of zeros (or other values) around the input matrix. This is often done to preserve the spatial dimensions after convolution or to ensure that the filter can be applied to border pixels. For example, if we add a padding of 0 to our original 4x4 input, we get:
+Both pooling operations reduce the spatial dimensions of the input \cite{cs231n}. Max pooling tends to highlight the strongest features, while average pooling provides a smoother representation of the features.
+Padding is another important concept in CNNs. This is done by surrounding the input matrix with zeros or ones (or any other arbitrary value). This is often done to preserve the spatial dimensions after convolution or to ensure that the filter can be applied to border pixels. For example, if we add a padding of 0 to our original 4x4 input, we get:
 \[
 \begin{bmatrix}
 0 & 0 & 0 & 0 & 0 & 0 \\
@@ -172,14 +172,14 @@ Padding is another important concept in CNNs. It involves adding extra rows and 
 This padding allows us to apply a 3x3 convolution while maintaining the original 4x4 output dimensions.
 
 \subsubsection{The Classifier}
-Following the convolutional and pooling layers, CNNs typically incorporate one or more fully connected (FC) layers, also known as dense layers. These layers serve as the "classifier" part of the network and play a crucial role in interpreting the high-level features extracted by the preceding layers.
+CNNs usually include several fully connected (FC) layers, after the convolutional and pooling layers. These layers serve as the "classifier" part of the network and play a crucial role in interpreting the high-level features extracted by the preceding layers.
 In a fully connected layer, each neuron is connected to every neuron in the previous layer, hence the name "fully connected". This structure allows the network to combine global information across the entire feature space, as opposed to the local focus of convolutional layers.
 The primary functions of these FC layers include:
 \begin{itemize}
 \item \textbf{Feature integration:} FC layers combine local features detected by convolutional layers to form a global understanding of the input.
 \item \textbf{Non-linear mapping:} When combined with non-linear activation functions, FC layers can model complex, non-linear relationships between features and target outputs.
 \item \textbf{Dimensionality reduction:} FC layers often progressively reduce the dimensionality of the data, distilling the most relevant information for the final prediction.
-\item \textbf{Task-specific output:} The final FC layer is designed to produce outputs suitable for the specific task at hand, such as classification probabilities or regression values.
+\item \textbf{Task-specific output:} The outputs produced by the final FC layer are direct mappings to results of regression or classification, and are adjusted accordingly to the task at hand.
 \end{itemize}
 For instance, in a classification task, the output of the final FC layer typically has neurons corresponding to each possible class. A softmax activation function \cite{Softmax} is often applied to this layer to produce a probability distribution over the classes.
 Mathematically, the operation in a fully connected layer can be expressed as:
